@@ -9,7 +9,7 @@ describe PlainRecord::Model do
     end
     
     klass.properties.should == [:one]
-    object = klass.new({'one' => 1})
+    object = klass.new(nil, {'one' => 1})
     object.one.should == 1
     object.one = 2
     object.one.should == 2

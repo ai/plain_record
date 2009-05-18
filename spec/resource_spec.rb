@@ -11,4 +11,8 @@ describe PlainRecord::Resource do
     first.should_not == second
   end
   
+  it "should remeber it file" do
+    Post.load_file(FIRST).file.should == FIRST
+  end
+  
 end

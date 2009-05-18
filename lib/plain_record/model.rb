@@ -30,7 +30,7 @@ module PlainRecord
     # Load and return all entries in +file+.
     def load_file(file)
       data = ::YAML.load_file(file)
-      class_exec { new(data) }
+      class_exec { new(file, data) }
     end
     
     # Return all entries.

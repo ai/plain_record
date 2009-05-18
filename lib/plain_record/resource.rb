@@ -35,11 +35,15 @@ module PlainRecord
       end
     end
     
-    #
+    # Properties values.
     attr_reader :data
     
-    # Create new model instance with some +data+.
-    def initialize(data)
+    # File, where this object is stored.
+    attr_reader :file
+    
+    # Create new model instance with +data+ from +file+.
+    def initialize(file, data)
+      @file = file
       @data = data
     end
     
