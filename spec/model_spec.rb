@@ -44,16 +44,17 @@ describe PlainRecord::Model do
   end
   
   it "should load data from file" do
-    first_file  = File.join(File.dirname(__FILE__), 'data/1/post.m')
-    second_file = File.join(File.dirname(__FILE__), 'data/2/post.m')
-    
-    obj = Post.load_file(first_file)
+    obj = Post.load_file(FIRST)
     obj.should be_a(Post)
     obj.title.should == 'First'
     
-    obj = Post.load_file(second_file)
+    obj = Post.load_file(SECOND)
     obj.should be_a(Post)
     obj.title.should be_nil
+  end
+  
+  it "should load all entries" do
+    Post.all.should == [Post.load_file(SECOND), Post.load_file(FIRST)]
   end
   
 end

@@ -20,5 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 require 'pathname'
 
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
-require dir + 'resource'
 require dir + 'model'
+require dir + 'resource'
+
+module PlainRecord
+  class << self
+    # Root of all file path in Model#entry_in.
+    attr_accessor :root
+  end
+end

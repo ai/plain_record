@@ -33,7 +33,24 @@ module PlainRecord
       class_exec { new(data) }
     end
     
+    # Return all entries.
+    def all
+      Dir.glob(path).map { |file| load_file(file) }
+    end
+    
     private
+    
+    # Set glob +pattern+ for files with entry. Each file contain one entry.
+    #
+    #   enrty_in 'content/*/post.m'
+    def entry_in(pattern)
+      @path = pattern
+    end
+    
+    # Return glob +pattern+ for files with entry.
+    def path
+      File.join(PlainRecord.root, @path)
+    end
     
     # Add property to model with some +name+.
     #
