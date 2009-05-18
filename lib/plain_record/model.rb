@@ -17,16 +17,20 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require 'yaml'
+
 module PlainRecord
   # Static methods for model. Model class extend this class when Resource is
   # included into it. See Resource for instance methods of model.
   module Model
     
-    @@properties = []
+    # Properties names.
+    attr_reader :properties
     
-    # Return array of all property names.
-    def properties
-      @@properties
+    # Load and return all entries in +file+.
+    def load_file(file)
+      data = ::YAML.load_file(file)
+      class_exec { new(data) }
     end
     
     private
@@ -38,7 +42,8 @@ module PlainRecord
     # +:accessor+, +:writer+ or +:reader+ this method create standart methods
     # to access to property.
     def property(name, *definers)
-      @@properties << name
+      @properties ||= []
+      @properties << name
       accessors = {:reader => true, :writer => true}
       
       definers.each do |definer|
@@ -54,14 +59,14 @@ module PlainRecord
       if accessors[:reader]
         class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
-            @data[:#{name}]
+            @data['#{name}']
           end
         EOS
       end
       if accessors[:writer]
         class_eval <<-EOS, __FILE__, __LINE__
           def #{name}=(value)
-            @data[:#{name}] = value
+            @data['#{name}'] = value
           end
         EOS
       end

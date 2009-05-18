@@ -1,5 +1,11 @@
 require File.join(File.dirname(__FILE__), '../lib/plain_record')
 
+class Post
+  include PlainRecord::Resource
+  
+  property :title
+end
+
 def model_methods(model)
     model.instance_methods - Object.instance_methods -
         PlainRecord::Resource.instance_methods

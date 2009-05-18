@@ -9,7 +9,7 @@ describe PlainRecord::Model do
     end
     
     klass.properties.should == [:one]
-    object = klass.new({:one => 1})
+    object = klass.new({'one' => 1})
     object.one.should == 1
     object.one = 2
     object.one.should == 2
@@ -41,6 +41,19 @@ describe PlainRecord::Model do
       include PlainRecord::Resource
       property :one, definer.method(:accessor)
     end
+  end
+  
+  it "should load data from file" do
+    first_file  = File.join(File.dirname(__FILE__), 'data/1/post.m')
+    second_file = File.join(File.dirname(__FILE__), 'data/2/post.m')
+    
+    obj = Post.load_file(first_file)
+    obj.should be_a(Post)
+    obj.title.should == 'First'
+    
+    obj = Post.load_file(second_file)
+    obj.should be_a(Post)
+    obj.title.should be_nil
   end
   
 end
