@@ -24,6 +24,8 @@ module PlainRecord
   #   class Post
   #     include PlainRecord::Resource
   #     
+  #     entry_in '/content/*/post.m'
+  #     
   #     property :title
   #   end
   module Resource
@@ -33,9 +35,19 @@ module PlainRecord
       end
     end
     
+    #
+    attr_reader :data
+    
     # Create new model instance with some +data+.
     def initialize(data)
       @data = data
     end
+    
+    # Compare if its properties are equal.
+    def eql?(other)
+      return false unless other.kind_of?(self.class)
+      @data == other.data
+    end
+    alias == eql?
   end
 end

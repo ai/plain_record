@@ -3,8 +3,15 @@ require File.join(File.dirname(__FILE__), '../lib/plain_record')
 class Post
   include PlainRecord::Resource
   
+  entry_in '*/post.m'
+  
   property :title
 end
+
+PlainRecord.root = File.join(File.dirname(__FILE__), 'data')
+
+FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
+SECOND = File.join(File.dirname(__FILE__), 'data/2/post.m')
 
 def model_methods(model)
     model.instance_methods - Object.instance_methods -
