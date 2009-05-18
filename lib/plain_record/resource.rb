@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
 module PlainRecord
-  # Module to be included into model class.
+  # Module to be included into model class. Contain instance methods. See
+  # Model for class methods.
   #
   #   class Post
   #     include PlainRecord::Resource
@@ -27,59 +28,14 @@ module PlainRecord
   #   end
   module Resource
     class << self
-      def included(base)
-        base.send :extend, self
+      def included(base) #:nodoc:
+        base.send :extend, Model
       end
     end
-    
-    @@properties = []
     
     # Create new model instance with some +data+.
     def initialize(data)
       @data = data
-    end
-    
-    # Return array of all property names.
-    def properties
-      @@properties
-    end
-    
-    private
-    
-    # Add property to model with some +name+.
-    #
-    # You can provide your own define logic by +definers+. Definer Proc
-    # will be call with property name in firts argument and may return
-    # +:accessor+, +:writer+ or +:reader+ this method create standart methods
-    # to access to property.
-    def property(name, *definers)
-      @@properties << name
-      accessors = {:reader => true, :writer => true}
-      
-      definers.each do |definer|
-        access = definer.call(name)
-        if :writer == access or access.nil?
-          accessors[:reader] = false
-        end
-        if :reader == access or access.nil?
-          accessors[:writer] = false
-        end
-      end
-      
-      if accessors[:reader]
-        class_eval <<-EOS, __FILE__, __LINE__
-          def #{name}
-            @data[:#{name}]
-          end
-        EOS
-      end
-      if accessors[:writer]
-        class_eval <<-EOS, __FILE__, __LINE__
-          def #{name}=(value)
-            @data[:#{name}] = value
-          end
-        EOS
-      end
     end
   end
 end

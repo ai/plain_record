@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-describe PlainRecord::Resource do
+describe PlainRecord::Model do
   
   it "should define property" do
     klass = Class.new do

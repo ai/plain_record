@@ -21,3 +21,4 @@ require 'pathname'
 
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'resource'
+require dir + 'model'
