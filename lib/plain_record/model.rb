@@ -75,14 +75,16 @@ module PlainRecord
       nil
     end
     
-    private
-    
-    # Call block on all entry.
+    # Call block on all entry. Unlike <tt>all.each</tt> it use lazy file
+    # loading, so it is useful if you planing to break this loop somewhere in
+    # the middle (for example, like +first+).
     def each_entry
       Dir.glob(path).each do |file|
         yield load_file(file)
       end
     end
+    
+    private
     
     # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
     def match(object, matchers)
