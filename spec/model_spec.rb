@@ -78,11 +78,11 @@ describe PlainRecord::Model do
   end
   
   it "should load all entries" do
-    Post.all.should == [Post.load_file(SECOND), Post.load_file(FIRST)]
+    Post.all.should == [SECOND_POST, THIRD_POST, FIRST_POST]
   end
   
   it "should return entries by string matcher" do
-    Post.all(:title => 'First').should == [Post.load_file(FIRST)]
+    Post.all(:title => 'First').should == [FIRST_POST]
   end
   
   it "should return entries by regexp matcher" do
@@ -90,7 +90,23 @@ describe PlainRecord::Model do
   end
   
   it "should return entries by search proc" do
-    Post.all { |i| i.title.nil? }.should == [Post.load_file(SECOND)]
+    Post.all { |i| not i.title.nil? }.should == [THIRD_POST, FIRST_POST]
+  end
+  
+  it "should return first entry" do
+    Post.first.should be_a(Post)
+  end
+  
+  it "should return entry by string matcher" do
+    Post.first(:title => 'Third').should == THIRD_POST
+  end
+  
+  it "should return entry by regexp matcher" do
+    Post.first(:title => /First|Third/).should == THIRD_POST
+  end
+  
+  it "should return entry by search proc" do
+    Post.first { |i| false }.should be_nil
   end
   
 end

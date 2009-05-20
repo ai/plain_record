@@ -37,23 +37,52 @@ module PlainRecord
       class_exec { new(file, data, texts) }
     end
     
-    # Return all entries, which is match for +matchers+ or return true on
+    # Return all entries, which is match for +matchers+ and return true on
     # +block+.
     #
     # Matchers is a Hash with property name in key and String or Regexp for
     # match in value.
     #
     #   Post.all(title: 'Post title')
-    #   Post.all(title: /^Post/)
-    #   Post.all { |post| 2 < Post.title.length }
+    #   Post.all(title: /^Post/, summary: /cool/)
+    #   Post.all { |post| 20 < Post.content.length }
     def all(matchers = {}, &block)
-      objects = Dir.glob(path).map { |file| load_file(file) }
-      objects.delete_if { |i| not match(i, matchers) } if matchers
-      objects.delete_if { |i| not block.call(i) } if block_given?
-      objects
+      entries = Dir.glob(path).map { |file| load_file(file) }
+      entries.delete_if { |i| not match(i, matchers) } if matchers
+      entries.delete_if { |i| not block.call(i) } if block_given?
+      entries
+    end
+    
+    # Return first entry, which is match for +matchers+ and return true on
+    # +block+.
+    #
+    # Matchers is a Hash with property name in key and String or Regexp for
+    # match in value.
+    #
+    #   Post.first(title: 'Post title')
+    #   Post.first(title: /^Post/, summary: /cool/)
+    #   Post.first { |post| 2 < Post.title.length }
+    def first(matchers = {}, &block)
+      if matchers and block_given?
+        each_entry { |i| return i if match(i, matchers) and block.call(i) }
+      elsif matchers
+        each_entry { |i| return i if match(i, matchers) }
+      elsif block_given?
+        each_entry { |i| return i if block.call(i) }
+      else
+        each_entry { |i| return i }
+      end
+      nil
     end
     
     private
+    
+    # Call block on all entry.
+    def each_entry
+      Dir.glob(path).each do |file|
+        yield load_file(file)
+      end
+    end
     
     # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
     def match(object, matchers)

@@ -14,6 +14,10 @@ PlainRecord.root = File.join(File.dirname(__FILE__), 'data')
 
 FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
 SECOND = File.join(File.dirname(__FILE__), 'data/2/post.m')
+THIRD  = File.join(File.dirname(__FILE__), 'data/3/post.m')
+FIRST_POST = Post.load_file(FIRST)
+SECOND_POST = Post.load_file(SECOND)
+THIRD_POST = Post.load_file(THIRD)
 
 def model_methods(model)
     model.instance_methods - Object.instance_methods -
