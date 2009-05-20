@@ -37,12 +37,36 @@ module PlainRecord
       class_exec { new(file, data, texts) }
     end
     
-    # Return all entries.
-    def all
-      Dir.glob(path).map { |file| load_file(file) }
+    # Return all entries, which is match for +matchers+ or return true on
+    # +block+.
+    #
+    # Matchers is a Hash with property name in key and String or Regexp for
+    # match in value.
+    #
+    #   Post.all(title: 'Post title')
+    #   Post.all(title: /^Post/)
+    #   Post.all { |post| 2 < Post.title.length }
+    def all(matchers = {}, &block)
+      objects = Dir.glob(path).map { |file| load_file(file) }
+      objects.delete_if { |i| not match(i, matchers) } if matchers
+      objects.delete_if { |i| not block.call(i) } if block_given?
+      objects
     end
     
     private
+    
+    # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
+    def match(object, matchers)
+      matchers.each_pair do |key, matcher|
+        result = if matcher.is_a? Regexp
+          object.send(key) =~ matcher
+        else
+          object.send(key) == matcher
+        end
+        return false unless result
+      end
+      true
+    end
     
     # Set glob +pattern+ for files with entry. Each file contain one entry.
     #

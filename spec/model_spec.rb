@@ -81,4 +81,16 @@ describe PlainRecord::Model do
     Post.all.should == [Post.load_file(SECOND), Post.load_file(FIRST)]
   end
   
+  it "should return entries by string matcher" do
+    Post.all(:title => 'First').should == [Post.load_file(FIRST)]
+  end
+  
+  it "should return entries by regexp matcher" do
+    Post.all(:title => /First/, :title => /Second/).should be_empty
+  end
+  
+  it "should return entries by search proc" do
+    Post.all { |i| i.title.nil? }.should == [Post.load_file(SECOND)]
+  end
+  
 end
