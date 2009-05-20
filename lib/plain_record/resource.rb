@@ -27,6 +27,8 @@ module PlainRecord
   #     entry_in '/content/*/post.m'
   #     
   #     property :title
+  #     text :summary
+  #     text :content
   #   end
   module Resource
     class << self
@@ -38,19 +40,23 @@ module PlainRecord
     # Properties values.
     attr_reader :data
     
+    # Texts values.
+    attr_reader :texts
+    
     # File, where this object is stored.
     attr_reader :file
     
-    # Create new model instance with +data+ from +file+.
-    def initialize(file, data)
+    # Create new model instance with YAML +data+ and +texts+ from +file+.
+    def initialize(file, data, texts)
       @file = file
       @data = data
+      @texts = texts
     end
     
-    # Compare if its properties are equal.
+    # Compare if its properties and texts are equal.
     def eql?(other)
       return false unless other.kind_of?(self.class)
-      @data == other.data
+      @data == other.data and @texts == @texts
     end
     alias == eql?
   end

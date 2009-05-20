@@ -6,6 +6,8 @@ class Post
   entry_in '*/post.m'
   
   property :title
+  text :summary
+  text :content
 end
 
 PlainRecord.root = File.join(File.dirname(__FILE__), 'data')
@@ -21,11 +23,6 @@ end
 Spec::Matchers.define :has_methods do |*methods|
   match do |model|
     model_methods(model).sort == methods.sort
-  end
-end
-Spec::Matchers.define :has_no_methods do |*methods|
-  match do |model|
-    model_methods(model).empty?
   end
 end
 

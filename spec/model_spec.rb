@@ -9,10 +9,23 @@ describe PlainRecord::Model do
     end
     
     klass.properties.should == [:one]
-    object = klass.new(nil, {'one' => 1})
+    object = klass.new(nil, {'one' => 1}, [])
     object.one.should == 1
     object.one = 2
     object.one.should == 2
+  end
+  
+  it "should define text" do
+    klass = Class.new do
+      include PlainRecord::Resource
+      text :content
+    end
+    
+    klass.texts.should == [:content]
+    object = klass.new(nil, {}, ['text'])
+    object.content.should == 'text'
+    object.content = 'another'
+    object.content.should == 'another'
   end
   
   it "should call definer" do
@@ -20,18 +33,19 @@ describe PlainRecord::Model do
       include PlainRecord::Resource
       property :one, Definers.accessor
       property :two, Definers.reader
-      property :three, Definers.writer
-      property :four, Definers.none
+      text :three, Definers.writer
+      text :four, Definers.none
     end
     klass.should has_methods(:one, :'one=', :'three=', :two)
   end
   
-  it "should call definers" do
+  it "should use accessors from definers" do
     klass = Class.new do
       include PlainRecord::Resource
       property :one, Definers.writer, Definers.reader, Definers.accessor
+      text :two, Definers.reader
     end
-    klass.should has_no_methods
+    klass.should has_methods(:two)
   end
   
   it "should send property name to definer" do
@@ -43,7 +57,7 @@ describe PlainRecord::Model do
     end
   end
   
-  it "should load data from file" do
+  it "should load YAML data from file" do
     obj = Post.load_file(FIRST)
     obj.should be_a(Post)
     obj.title.should == 'First'
@@ -51,6 +65,16 @@ describe PlainRecord::Model do
     obj = Post.load_file(SECOND)
     obj.should be_a(Post)
     obj.title.should be_nil
+  end
+  
+  it "should load text data from entry file" do
+    obj = Post.load_file(FIRST)
+    obj.summary.should == 'first --- content'
+    obj.content.rstrip.should == "big\n---\ncontent"
+    
+    obj = Post.load_file(SECOND)
+    obj.summary.rstrip.should == " only one"
+    obj.content.should be_nil
   end
   
   it "should load all entries" do
