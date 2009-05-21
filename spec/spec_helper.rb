@@ -10,6 +10,15 @@ class Post
   text :content
 end
 
+class Author
+  include PlainRecord::Resource
+  
+  list_in 'data/authors/*.yml'
+  
+  property :login
+  property :name
+end
+
 PlainRecord.root = File.dirname(__FILE__)
 
 FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
@@ -18,6 +27,9 @@ THIRD  = File.join(File.dirname(__FILE__), 'data/3/post.m')
 FIRST_POST = Post.load_file(FIRST)
 SECOND_POST = Post.load_file(SECOND)
 THIRD_POST = Post.load_file(THIRD)
+
+INTERN = File.join(File.dirname(__FILE__), 'data/authors/intern.yml')
+EXTERN = File.join(File.dirname(__FILE__), 'data/authors/extern.yml')
 
 def model_methods(model)
     model.instance_methods - Object.instance_methods -

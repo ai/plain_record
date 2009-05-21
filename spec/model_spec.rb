@@ -9,7 +9,7 @@ describe PlainRecord::Model do
     end
     
     klass.properties.should == [:one]
-    object = klass.new(nil, {'one' => 1}, [])
+    object = klass.new(nil, {'one' => 1})
     object.one.should == 1
     object.one = 2
     object.one.should == 2
@@ -57,15 +57,25 @@ describe PlainRecord::Model do
     end
   end
   
-  it "should find all model files by glob pattern" do
+  it "should find all enrty files by glob pattern" do
     klass = Class.new do
       include PlainRecord::Resource
       entry_in 'data/*/post.m'
     end
+    klass.storage.should == :entry
     klass.files.sort.should == [FIRST, SECOND, THIRD]
   end
   
-  it "should load YAML data from file" do
+  it "should find all list files by glob pattern" do
+    klass = Class.new do
+      include PlainRecord::Resource
+      list_in 'data/authors/*.yml'
+    end
+    klass.storage.should == :list
+    klass.files.sort.should == [EXTERN, INTERN]
+  end
+  
+  it "should load YAML data from entry file" do
     obj = Post.load_file(FIRST)
     obj.should be_a(Post)
     obj.title.should == 'First'
@@ -76,13 +86,36 @@ describe PlainRecord::Model do
   end
   
   it "should load text data from entry file" do
-    obj = Post.load_file(FIRST)
-    obj.summary.should == 'first --- content'
-    obj.content.rstrip.should == "big\n---\ncontent"
+    post = Post.load_file(FIRST)
+    post.summary.should == 'first --- content'
+    post.content.rstrip.should == "big\n---\ncontent"
     
-    obj = Post.load_file(SECOND)
-    obj.summary.rstrip.should == " only one"
-    obj.content.should be_nil
+    post = Post.load_file(SECOND)
+    post.summary.rstrip.should == " only one"
+    post.content.should be_nil
+  end
+  
+  it "should load data from list file" do
+    authors = Author.load_file(EXTERN)
+    authors.length.should == 2
+    
+    authors[0].should be_a(Author)
+    authors[0].login.should be_nil
+    authors[0].name.should == 'Anonymous'
+    
+    authors[1].should be_a(Author)
+    authors[1].login.should == 'super1997'
+    authors[1].name.should == 'SuperHacker'
+  end
+  
+  it "shouldn't define text data in model with list storage" do
+    lambda {
+      klass = Class.new do
+        include PlainRecord::Resource
+        list_in 'data/authors/*.yml'
+        text :content
+      end
+    }.should raise_error /entry_in/
   end
   
   it "should load all entries" do
@@ -101,6 +134,10 @@ describe PlainRecord::Model do
     Post.all { |i| not i.title.nil? }.should == [THIRD_POST, FIRST_POST]
   end
   
+  it "should return all list entries" do
+    Author.all.map { |i| i.login }.should == [nil, 'super1997', 'john', 'ivan']
+  end
+  
   it "should return first entry" do
     Post.first.should be_a(Post)
   end
@@ -115,6 +152,10 @@ describe PlainRecord::Model do
   
   it "should return entry by search proc" do
     Post.first { |i| false }.should be_nil
+  end
+  
+  it "should return first list entry" do
+    Author.first { |i| not i.login.nil? }.name.should == 'SuperHacker'
   end
   
 end

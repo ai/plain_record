@@ -47,7 +47,7 @@ module PlainRecord
     attr_reader :file
     
     # Create new model instance with YAML +data+ and +texts+ from +file+.
-    def initialize(file, data, texts)
+    def initialize(file, data, texts = [])
       @file = file
       @data = data
       @texts = texts

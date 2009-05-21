@@ -22,7 +22,12 @@ require 'yaml'
 module PlainRecord
   # Static methods for model. Model class extend this class when Resource is
   # included into it. See Resource for instance methods of model.
+  #
+  # See also Model::Entry and Model::List for storage specific methods.
   module Model
+    dir = Pathname(__FILE__).dirname.expand_path + 'model'
+    autoload :Entry, (dir + 'entry').to_s
+    autoload :List,  (dir + 'list').to_s
     
     # Properties names.
     attr_reader :properties
@@ -30,12 +35,23 @@ module PlainRecord
     # Name of special properties with big text.
     attr_reader :texts
     
+    # Storage type: +:entry+ or +:list+.
+    attr_reader :storage
+    
+    # Content of already loaded files.
+    attr_reader :loaded
+    
     # Load and return all entries in +file+.
-    def load_file(file)
-      data, *texts = IO.read(file).split(/\n---[\t ]*\n/, @texts.length + 1)
-      data = ::YAML.load(data)
-      class_exec { new(file, data, texts) }
-    end
+    #
+    # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
+    def load_file(file); end
+    
+    # Call block on all entry. Unlike <tt>all.each</tt> it use lazy file
+    # loading, so it is useful if you planing to break this loop somewhere in
+    # the middle (for example, like +first+).
+    #
+    # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
+    def each_entry; end
     
     # Return all entries, which is match for +matchers+ and return true on
     # +block+.
@@ -47,7 +63,7 @@ module PlainRecord
     #   Post.all(title: /^Post/, summary: /cool/)
     #   Post.all { |post| 20 < Post.content.length }
     def all(matchers = {}, &block)
-      entries = files.map { |file| load_file(file) }
+      entries = all_entries
       entries.delete_if { |i| not match(i, matchers) } if matchers
       entries.delete_if { |i| not block.call(i) } if block_given?
       entries
@@ -75,21 +91,17 @@ module PlainRecord
       nil
     end
     
-    # Call block on all entry. Unlike <tt>all.each</tt> it use lazy file
-    # loading, so it is useful if you planing to break this loop somewhere in
-    # the middle (for example, like +first+).
-    def each_entry
-      files.each do |file|
-        yield load_file(file)
-      end
-    end
-    
     # Return all model files.
     def files
       Dir.glob(File.join(PlainRecord.root, @path))
     end
     
     private
+    
+    # Return all model entries.
+    #
+    # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
+    def all_entries; end
     
     # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
     def match(object, matchers)
@@ -107,9 +119,28 @@ module PlainRecord
     # Set glob +pattern+ for files with entry. Each file must contain one entry.
     # To set root for this path use +PlainRecord.root+.
     #
+    # Also add methods from <tt>Model::Entry</tt>.
+    #
     #   entry_in 'content/*/post.m'
     def entry_in(path)
+      @storage = :entry
       @path = path
+      self.extend PlainRecord::Model::Entry
+      @loaded = {}
+    end
+    
+    # Set glob +pattern+ for files with list of entries. Each file may contain
+    # several entries, but you may have several files. All data will storage
+    # in YAML, so you can’t define +text+.
+    #
+    # Also add methods from <tt>Model::List</tt>.
+    #
+    #   list_in 'content/authors.yml'
+    def list_in(path)
+      @storage = :list
+      @path = path
+      self.extend PlainRecord::Model::List
+      @loaded = {}
     end
     
     # Add property to model with some +name+. It will be stored as YAML.
@@ -118,6 +149,14 @@ module PlainRecord
     # will be call with property name in first argument and may return
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
     # to access to property.
+    # 
+    #   class Post
+    #     include PlainRecord::Resource
+    #
+    #     entry_in 'posts/*/post.m'
+    #
+    #     property :title
+    #   end
     def property(name, *definers)
       @properties ||= []
       @properties << name
@@ -148,11 +187,18 @@ module PlainRecord
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
     # to access to property.
     #
+    # Note, that text is supported by only +entry_in+ models, which entry store
+    # in separated files.
+    #
     # == Example
     #
     # Model:
     # 
     #   class Post
+    #     include PlainRecord::Resource
+    #
+    #     entry_in 'posts/*/post.m'
+    #
     #     property :title
     #     text :summary
     #     text :content
@@ -166,6 +212,10 @@ module PlainRecord
     #   ---
     #   Post text
     def text(name, *definers)
+      if :list == @storage
+        raise ArgumentError, 'Text is supported by only entry_in models'
+      end
+      
       @texts ||= []
       @texts << name
       number = @texts.length - 1
