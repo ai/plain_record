@@ -47,7 +47,7 @@ module PlainRecord
     #   Post.all(title: /^Post/, summary: /cool/)
     #   Post.all { |post| 20 < Post.content.length }
     def all(matchers = {}, &block)
-      entries = Dir.glob(path).map { |file| load_file(file) }
+      entries = files.map { |file| load_file(file) }
       entries.delete_if { |i| not match(i, matchers) } if matchers
       entries.delete_if { |i| not block.call(i) } if block_given?
       entries
@@ -79,9 +79,14 @@ module PlainRecord
     # loading, so it is useful if you planing to break this loop somewhere in
     # the middle (for example, like +first+).
     def each_entry
-      Dir.glob(path).each do |file|
+      files.each do |file|
         yield load_file(file)
       end
+    end
+    
+    # Return all model files.
+    def files
+      Dir.glob(File.join(PlainRecord.root, @path))
     end
     
     private
@@ -99,16 +104,12 @@ module PlainRecord
       true
     end
     
-    # Set glob +pattern+ for files with entry. Each file contain one entry.
+    # Set glob +pattern+ for files with entry. Each file must contain one entry.
+    # To set root for this path use +PlainRecord.root+.
     #
     #   entry_in 'content/*/post.m'
-    def entry_in(pattern)
-      @path = pattern
-    end
-    
-    # Return glob +pattern+ for files with entry.
-    def path
-      File.join(PlainRecord.root, @path)
+    def entry_in(path)
+      @path = path
     end
     
     # Add property to model with some +name+. It will be stored as YAML.

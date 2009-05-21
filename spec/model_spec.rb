@@ -57,6 +57,14 @@ describe PlainRecord::Model do
     end
   end
   
+  it "should find all model files by glob pattern" do
+    klass = Class.new do
+      include PlainRecord::Resource
+      entry_in 'data/*/post.m'
+    end
+    klass.files.sort.should == [FIRST, SECOND, THIRD]
+  end
+  
   it "should load YAML data from file" do
     obj = Post.load_file(FIRST)
     obj.should be_a(Post)

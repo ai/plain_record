@@ -3,14 +3,14 @@ require File.join(File.dirname(__FILE__), '../lib/plain_record')
 class Post
   include PlainRecord::Resource
   
-  entry_in '*/post.m'
+  entry_in 'data/*/post.m'
   
   property :title
   text :summary
   text :content
 end
 
-PlainRecord.root = File.join(File.dirname(__FILE__), 'data')
+PlainRecord.root = File.dirname(__FILE__)
 
 FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
 SECOND = File.join(File.dirname(__FILE__), 'data/2/post.m')
