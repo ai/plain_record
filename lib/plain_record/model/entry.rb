@@ -23,7 +23,7 @@ module PlainRecord
     # only one entry.
     module Entry
       def load_file(file)
-        unless @loaded[file]
+        unless @loaded.has_key? file
           data, *texts = IO.read(file).split(/\n---[\t ]*\n/, @texts.length + 1)
           data = ::YAML.load(data)
           @loaded[file] = self.new(file, data, texts)
@@ -41,6 +41,10 @@ module PlainRecord
       
       def all_entries
         files.map { |file| load_file(file) }
+      end
+      
+      def entries_string(entry)
+        entry.to_yaml + entry.texts.map{ |i| "---\n" + i }.join("\n")
       end
     end
   end

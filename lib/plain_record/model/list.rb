@@ -23,7 +23,7 @@ module PlainRecord
     # only several entry.
     module List
       def load_file(file)
-        unless @loaded[file]
+        unless @loaded.has_key? file
           data = ::YAML.load_file(file)
           @loaded[file] = data.map { |i| self.new(file, i) }
         end
@@ -42,6 +42,10 @@ module PlainRecord
       
       def all_entries
         files.map { |file| load_file(file) }.flatten
+      end
+      
+      def entries_string(entries)
+        entries.to_yaml
       end
     end
   end

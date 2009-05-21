@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
 require 'pathname'
+require 'yaml'
 
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'model'

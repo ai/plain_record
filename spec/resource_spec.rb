@@ -15,4 +15,37 @@ describe PlainRecord::Resource do
     Post.load_file(FIRST).file.should == FIRST
   end
   
+  it "should save entry" do
+    file = StringIO.new
+    File.should_receive(:open).with(FIRST, 'w').and_yield(file)
+    
+    first = Post.first(:title => 'First')
+    first.title = 'First 1'
+    first.save
+    
+    file.rewind
+    file.read.should == "title: First 1\n" +
+                        "---\n" +
+                        "first --- content\n" +
+                        "---\n" +
+                        "big\n" +
+                        "---\n" +
+                        "content\n"
+  end
+  
+  it "should save in_list entry" do
+    file = StringIO.new
+    File.should_receive(:open).with(INTERN, 'w').and_yield(file)
+    
+    john = Author.first(:login => 'john')
+    john.name = 'New name'
+    john.save
+    
+    file.rewind
+    file.read.should == "- login: john\n" +
+                        "  name: New name\n" +
+                        "- login: ivan\n" +
+                        "  name: Ivan Ivanov\n"
+  end
+  
 end

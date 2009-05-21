@@ -17,8 +17,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'yaml'
-
 module PlainRecord
   # Static methods for model. Model class extend this class when Resource is
   # included into it. See Resource for instance methods of model.
@@ -52,6 +50,15 @@ module PlainRecord
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def each_entry; end
+      
+    # Write all loaded entries to +file+.
+    def save_file(file)
+      if @loaded.has_key? file
+        File.open(file, 'w') do |io|
+          io.write entries_string(@loaded[file]).slice(5..-1)
+        end
+      end
+    end
     
     # Return all entries, which is match for +matchers+ and return true on
     # +block+.
@@ -102,6 +109,11 @@ module PlainRecord
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def all_entries; end
+    
+    # Return string representation of +entries+ to write it to file.
+    #
+    # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
+    def entries_string(entries); end
     
     # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
     def match(object, matchers)

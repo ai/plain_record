@@ -53,6 +53,17 @@ module PlainRecord
       @texts = texts
     end
     
+    # Save entry to file. Note, that for in_list models it also save all other
+    # entries in file.
+    def save
+      self.class.save_file(@file)
+    end
+    
+    # Return string of YAML representation of entry +data+.
+    def to_yaml(opts = {})
+      @data.to_yaml(opts)
+    end
+    
     # Compare if its properties and texts are equal.
     def eql?(other)
       return false unless other.kind_of?(self.class)
