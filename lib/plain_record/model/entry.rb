@@ -37,6 +37,11 @@ module PlainRecord
         end
       end
       
+      def remove_entry(file, entry = nil)
+        File.delete(file)
+        @loaded.delete(file)
+      end
+      
       private
       
       def all_entries

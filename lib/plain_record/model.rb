@@ -50,6 +50,11 @@ module PlainRecord
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def each_entry; end
+    
+    # Delete +entry+ from +file+.
+    #
+    # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
+    def remove_entry(file, entry = nil); end
       
     # Write all loaded entries to +file+.
     def save_file(file)

@@ -20,11 +20,10 @@ describe PlainRecord::Resource do
     File.should_receive(:open).with(FIRST, 'w').and_yield(file)
     
     first = Post.first(:title => 'First')
-    first.title = 'First 1'
     first.save
     
     file.rewind
-    file.read.should == "title: First 1\n" +
+    file.read.should == "title: First\n" +
                         "---\n" +
                         "first --- content\n" +
                         "---\n" +
@@ -33,19 +32,41 @@ describe PlainRecord::Resource do
                         "content\n"
   end
   
-  it "should save in_list entry" do
+  it "should save list entry" do
     file = StringIO.new
     File.should_receive(:open).with(INTERN, 'w').and_yield(file)
     
     john = Author.first(:login => 'john')
-    john.name = 'New name'
     john.save
     
     file.rewind
     file.read.should == "- login: john\n" +
-                        "  name: New name\n" +
+                        "  name: John Smith\n" +
                         "- login: ivan\n" +
                         "  name: Ivan Ivanov\n"
+  end
+  
+  it "should delete entry" do
+    File.should_receive(:delete).with(FIRST)
+    Post.first(:title => 'First').destroy
+    Post.loaded.should_not have_key(FIRST)
+  end
+  
+  it "should delete list entry" do
+    file = StringIO.new
+    File.should_receive(:open).with(INTERN, 'w').and_yield(file)
+    
+    Author.first(:login => 'john').destroy
+    
+    Author.first(:login => 'john').should be_nil
+    file.rewind
+    file.read.should == "- login: ivan\n" +
+                        "  name: Ivan Ivanov\n"
+    
+    File.should_receive(:delete).with(INTERN)
+    
+    Author.first(:login => 'ivan').destroy
+    Post.loaded.should_not have_key(FIRST)
   end
   
 end
