@@ -83,6 +83,10 @@ For example we will create simple blog storage with posts and comments.
     
       post.title = 'First post'
       post.save
+    
+11. And delete it (with empty dirs in it file path):
+    
+      post.destroy
 
 == License
 Plain Record is licensed under the GNU Lesser General Public License version 3. 

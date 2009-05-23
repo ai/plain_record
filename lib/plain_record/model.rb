@@ -54,7 +54,7 @@ module PlainRecord
     # Delete +entry+ from +file+.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
-    def remove_entry(file, entry = nil); end
+    def delete_entry(file, entry = nil); end
       
     # Write all loaded entries to +file+.
     def save_file(file)
@@ -119,6 +119,19 @@ module PlainRecord
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def entries_string(entries); end
+    
+    # Delete file, cache and empty dirs in path.
+    def delete_file(file)
+      File.delete(file)
+      @loaded.delete(file)
+      
+      path = Pathname(file).dirname
+      root = Pathname(PlainRecord.root)
+      until 2 != path.entries.length or path == root
+        path.rmdir
+        path = path.parent
+      end
+    end
     
     # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
     def match(object, matchers)

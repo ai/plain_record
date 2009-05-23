@@ -61,7 +61,7 @@ module PlainRecord
     
     # Delete current entry and it file if there isn’t has any other entries.
     def destroy
-      self.class.remove_entry(@file, self)
+      self.class.delete_entry(@file, self)
     end
     
     # Return string of YAML representation of entry +data+.

@@ -47,9 +47,8 @@ describe PlainRecord::Resource do
   end
   
   it "should delete entry" do
-    File.should_receive(:delete).with(FIRST)
+    Post.should_receive(:delete_file).with(FIRST)
     Post.first(:title => 'First').destroy
-    Post.loaded.should_not have_key(FIRST)
   end
   
   it "should delete list entry" do
@@ -63,10 +62,8 @@ describe PlainRecord::Resource do
     file.read.should == "- login: ivan\n" +
                         "  name: Ivan Ivanov\n"
     
-    File.should_receive(:delete).with(INTERN)
-    
+    Author.should_receive(:delete_file).with(INTERN)
     Author.first(:login => 'ivan').destroy
-    Post.loaded.should_not have_key(FIRST)
   end
   
 end

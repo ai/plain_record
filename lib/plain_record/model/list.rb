@@ -38,10 +38,9 @@ module PlainRecord
         end
       end
       
-      def remove_entry(file, entry = nil)
+      def delete_entry(file, entry = nil)
         if entry.nil? or 1 == @loaded[file].length
-          File.delete(file)
-          @loaded.delete(file)
+          delete_file(file)
         else
           @loaded[file].delete(entry)
           save_file(file)

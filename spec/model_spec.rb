@@ -158,4 +158,17 @@ describe PlainRecord::Model do
     Author.first { |i| not i.login.nil? }.name.should == 'SuperHacker'
   end
   
+  it "should delete file, cache and empty dirs" do
+    File.should_receive(:delete).with(FIRST)
+    
+    first_dir = File.dirname(FIRST)
+    Dir.should_receive(:entries).with(first_dir).and_return(['.', '..'])
+    Dir.should_receive(:rmdir).with(first_dir)
+    Dir.should_receive(:entries).with(File.dirname(first_dir)).and_return(
+        ['.', '..', '2', '3'])
+    
+    Post.instance_eval { delete_file(FIRST) }
+    Post.loaded.should_not have_key(FIRST)
+  end
+  
 end
