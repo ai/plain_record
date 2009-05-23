@@ -72,7 +72,7 @@ module PlainRecord
     # Compare if its properties and texts are equal.
     def eql?(other)
       return false unless other.kind_of?(self.class)
-      @data == other.data and @texts == @texts
+      @file == other.file and @data == other.data and @texts == @texts
     end
     alias == eql?
   end
