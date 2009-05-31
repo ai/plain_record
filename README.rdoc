@@ -53,7 +53,7 @@ For example we will create simple blog storage with posts and comments.
      end
    
    You can’t use text fields in list files.
-6. List files is a just YAML array. For example 
+6. List files is a just YAML array. For example,
    <tt>data/first/comments.yml</tt>:
    
      - author: Anonymous

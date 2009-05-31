@@ -22,6 +22,7 @@ require 'yaml'
 
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'version'
+require dir + 'callbacks'
 require dir + 'model'
 require dir + 'resource'
 

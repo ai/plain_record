@@ -19,6 +19,16 @@ class Author
   property :name
 end
 
+module Fullname
+  include PlainRecord::Callbacks
+  
+  def fullname(first, second)
+    use_callbacks(:fullname, first, second) do
+      first + ' ' + second
+    end
+  end
+end
+
 PlainRecord.root = File.dirname(__FILE__)
 
 FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
