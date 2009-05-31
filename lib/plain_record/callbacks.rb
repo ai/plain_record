@@ -96,16 +96,14 @@ module PlainRecord
     #     end
     #   end
     def use_callbacks(event, *params, &block)
-      unless @callbacks
-        @callbacks = {:before => Hash.new([]), :after => Hash.new([])}
-      end
+      init_callbacks(event)
       
       @callbacks[:before][event].each do |before, priority|
         before.call(*params)
       end
         
       result = yield
-        
+      
       @callbacks[:after][event].each do |after, priority|
         result = after.call(result, *params)
       end
@@ -116,12 +114,19 @@ module PlainRecord
     
     # Backend for +before+ and +after+ method to add callback.
     def add_callback(type, event, priority, block)
-      unless @callbacks
-        @callbacks = {:before => Hash.new([]), :after => Hash.new([])}
-      end
+      init_callbacks(event)
       
       @callbacks[type][event] << [block, priority]
       @callbacks[type][event].sort! { |a, b| a[1] <=> b[1] }
+    end
+    
+    # Check and create Hash into +callbacks+ for +event+ if necessary.
+    def init_callbacks(event)
+      unless @callbacks
+        @callbacks = {:before => {}, :after => {}}
+      end
+      @callbacks[:before][event] = [] unless @callbacks[:before][event]
+      @callbacks[:after][event] = [] unless @callbacks[:after][event]
     end
   end
 end

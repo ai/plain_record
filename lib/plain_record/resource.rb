@@ -21,10 +21,22 @@ module PlainRecord
   # Module to be included into model class. Contain instance methods. See
   # Model for class methods.
   #
+  # You can set your callbacks before and after some methods/events:
+  # * <tt>path(matchers)</tt> – return file names for model which is match for
+  #   matchers;
+  # * <tt>load(enrty)</tt> – load or create new entry;
+  # * <tt>destroy(entry)</tt> – delete entry;
+  # * <tt>save(entry)</tt> – write entry to file.
+  # See PlainRecord::Callbacks for details.
+  #
   #   class Post
   #     include PlainRecord::Resource
   #     
   #     entry_in '/content/*/post.m'
+  #     
+  #     before :save do |enrty|
+  #       entry.title = Time.now.to.s unless entry.title
+  #     end
   #     
   #     property :title
   #     text :summary
@@ -48,20 +60,26 @@ module PlainRecord
     
     # Create new model instance with YAML +data+ and +texts+ from +file+.
     def initialize(file, data, texts = [])
-      @file = file
-      @data = data
-      @texts = texts
+      self.class.use_callbacks(:load, self) do
+        @file = file
+        @data = data
+        @texts = texts
+      end
     end
     
     # Save entry to file. Note, that for in_list models it also save all other
     # entries in file.
     def save
-      self.class.save_file(@file)
+      self.class.use_callbacks(:save, self) do
+        self.class.save_file(@file)
+      end
     end
     
     # Delete current entry and it file if there isn’t has any other entries.
     def destroy
-      self.class.delete_entry(@file, self)
+      self.class.use_callbacks(:destroy, self) do
+        self.class.delete_entry(@file, self)
+      end
     end
     
     # Return string of YAML representation of entry +data+.

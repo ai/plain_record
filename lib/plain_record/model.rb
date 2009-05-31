@@ -27,6 +27,8 @@ module PlainRecord
     autoload :Entry, (dir + 'entry').to_s
     autoload :List,  (dir + 'list').to_s
     
+    include PlainRecord::Callbacks
+    
     # Properties names.
     attr_reader :properties
     
@@ -44,12 +46,12 @@ module PlainRecord
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def load_file(file); end
     
-    # Call block on all entry. Unlike <tt>all.each</tt> it use lazy file
-    # loading, so it is useful if you planing to break this loop somewhere in
-    # the middle (for example, like +first+).
+    # Call block on all entry, which is may be match for +matchers+. Unlike
+    # <tt>all.each</tt> it use lazy file loading, so it is useful if you planing
+    # to break this loop somewhere in the middle (for example, like +first+).
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
-    def each_entry; end
+    def each_entry(matchers = {}); end
     
     # Delete +entry+ from +file+.
     #
@@ -75,7 +77,7 @@ module PlainRecord
     #   Post.all(title: /^Post/, summary: /cool/)
     #   Post.all { |post| 20 < Post.content.length }
     def all(matchers = {}, &block)
-      entries = all_entries
+      entries = all_entries(matchers)
       entries.delete_if { |i| not match(i, matchers) } if matchers
       entries.delete_if { |i| not block.call(i) } if block_given?
       entries
@@ -92,9 +94,9 @@ module PlainRecord
     #   Post.first { |post| 2 < Post.title.length }
     def first(matchers = {}, &block)
       if matchers and block_given?
-        each_entry { |i| return i if match(i, matchers) and block.call(i) }
+        each_entry(matchers) { |i| return i if match(i, matchers) and block.call(i) }
       elsif matchers
-        each_entry { |i| return i if match(i, matchers) }
+        each_entry(matchers) { |i| return i if match(i, matchers) }
       elsif block_given?
         each_entry { |i| return i if block.call(i) }
       else
@@ -103,17 +105,25 @@ module PlainRecord
       nil
     end
     
-    # Return all model files.
-    def files
-      Dir.glob(File.join(PlainRecord.root, @path))
+    # Return all file list for models, which match for +matchers+.
+    def files(matchers = {})
+      Dir.glob(File.join(PlainRecord.root, path(matchers)))
+    end
+    
+    # Return glob pattern to for files with entris, which is may be match for
+    # +matchers+.
+    def path(matchers = {})
+      use_callbacks(:path, matchers) do
+        @path
+      end
     end
     
     private
     
-    # Return all model entries.
+    # Return all model entries, which is may be match for +matchers+.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
-    def all_entries; end
+    def all_entries(matchers); end
     
     # Return string representation of +entries+ to write it to file.
     #
