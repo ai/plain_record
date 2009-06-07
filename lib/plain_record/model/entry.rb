@@ -41,6 +41,14 @@ module PlainRecord
         delete_file(file)
       end
       
+      def move_entry(entry, from, to)
+        if from
+          @loaded.delete(from)
+          delete_file(from)
+        end
+        @loaded[to] = entry
+      end
+      
       private
       
       def all_entries(matcher = {})

@@ -65,10 +65,8 @@ module PlainRecord
     # Create new model instance with YAML +data+ and +texts+ from +file+.
     def initialize(file = nil, data = {}, texts = [])
       self.class.use_callbacks(:load, self) do
-        if file.is_a? Hash
-          data = file
-          file = nil
-        end
+        texts, data = data, nil if data.is_a? Array
+        data, file = file, nil if file.is_a? Hash
         
         @file = file
         @data = data
@@ -83,18 +81,10 @@ module PlainRecord
         value = File.join(PlainRecord.root, value)
       end
       
-      if :list == self.class.storage
-        self.class.loaded[@file].delete(self) if @file
-        
-        self.class.loaded[value] = [] unless self.class.loaded.has_key? value
-        self.class.loaded[value] << self
-      else
-        self.class.loaded.delete(@file) if @file
-        
-        self.class.loaded[value] = self
+      if @file != value
+        self.class.move_entry(self, @file, value)
+        @file = value
       end
-      
-      @file = value
     end
     
     # Return relative path to +file+ from <tt>PlainRecord.root</tt>.

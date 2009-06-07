@@ -47,6 +47,19 @@ module PlainRecord
         end
       end
       
+      def move_entry(entry, from, to)
+        if from
+          @loaded[from].delete(entry)
+          if @loaded[from].empty?
+            delete_file(from)
+          else
+            save_file(from)
+          end
+        end
+        @loaded[to] = [] unless @loaded.has_key? to
+        @loaded[to] << entry
+      end
+      
       private
       
       def all_entries(matcher = {})

@@ -2,6 +2,11 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe PlainRecord::Model do
   
+  after :each do
+    Post.loaded = {}
+    Author.loaded = {}
+  end
+  
   it "should define property" do
     klass = Class.new do
       include PlainRecord::Resource
@@ -169,6 +174,27 @@ describe PlainRecord::Model do
     
     Post.instance_eval { delete_file(FIRST) }
     Post.loaded.should_not have_key(FIRST)
+  end
+  
+  it "should move entry from one file to another" do
+    first = Post.first(:title => 'First')
+    Post.should_receive(:delete_file).with(FIRST)
+    Post.should_receive(:save_file).with(File.join(PlainRecord.root, 'file'))
+    first.file = 'file'
+    first.save
+  end
+  
+  it "should move list entry from one file to another" do
+    path = File.join(PlainRecord.root, 'file')
+    Author.should_receive(:save_file).with(INTERN).once
+    Author.should_receive(:save_file).with(path).twice
+    Author.should_receive(:delete_file).with(INTERN).once
+    
+    authors = Author.all(:login => /john|ivan/)
+    authors.each do |author|
+      author.file = 'file'
+      author.save
+    end
   end
   
 end

@@ -58,6 +58,11 @@ module PlainRecord
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def delete_entry(file, entry = nil); end
+    
+    # Move +entry+ from one file to another.
+    #
+    # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
+    def move_entry(entry, from, to); end
       
     # Write all loaded entries to +file+.
     def save_file(file)

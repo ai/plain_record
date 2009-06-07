@@ -22,7 +22,7 @@ module PlainRecord
   # after some method, to change it logic.
   module Callbacks
     # Hash of class callbacks with property.
-    attr_reader :callbacks
+    attr_accessor :callbacks
     
     # Set block as callback before +event+. Callback with less +priority+ will
     # start earlier.

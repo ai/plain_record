@@ -43,8 +43,9 @@ describe PlainRecord::Filepath do
   
   it "should get entry path by filepath properties" do
     path = File.join(File.dirname(__FILE__), 'data/5/post.m')
-    File.should_receive(:open).with(path, 'w').and_yield(StringIO.new)
-    post = ::FilepathPost.new(:id => 5, :category => '').save
+    post = ::FilepathPost.new(:id => 5, :category => '')
+    ::FilepathPost.should_receive(:move_entry).with(post, nil, path)
+    post.save
   end
   
   it "should raise error, when can't get entry path by filepath properties" do

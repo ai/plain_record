@@ -3,10 +3,8 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe PlainRecord::Resource do
   
   after :each do
-    Post.class_eval do
-      @loaded = {}
-      @callbacks = nil
-    end
+    Post.loaded = {}
+    Author.loaded = {}
   end
   
   it "should compare two object" do
@@ -42,6 +40,7 @@ describe PlainRecord::Resource do
   
   it "should save list entry" do
     file = StringIO.new
+    Author.all
     File.should_receive(:open).with(INTERN, 'w').and_yield(file)
     
     john = Author.first(:login => 'john')
@@ -72,6 +71,7 @@ describe PlainRecord::Resource do
   
   it "should delete list entry" do
     file = StringIO.new
+    Author.all
     File.should_receive(:open).with(INTERN, 'w').and_yield(file)
     
     Author.first(:login => 'john').destroy
@@ -86,19 +86,20 @@ describe PlainRecord::Resource do
   end
   
   it "should call callbacks" do
+    Model = Post.dup
     callbacks = mock()
-    callbacks.should_receive(:path).with(Post.path, {:title => 'First'}).
+    callbacks.should_receive(:path).with(Model.path, {:title => 'First'}).
                                     and_return('data/1/post.m')
-    callbacks.should_receive(:load).with(an_instance_of(Post))
-    callbacks.should_receive(:save).with(FIRST_POST).and_raise
-    callbacks.should_receive(:destroy).with(FIRST_POST).and_raise
+    callbacks.should_receive(:load).with(an_instance_of(Model))
+    callbacks.should_receive(:save).with(an_instance_of(Model)).and_raise
+    callbacks.should_receive(:destroy).with(an_instance_of(Model)).and_raise
     
-    Post.after  :path,    &callbacks.method(:path)
-    Post.before :load,    &callbacks.method(:load)
-    Post.before :save,    &callbacks.method(:save)
-    Post.before :destroy, &callbacks.method(:destroy)
+    Model.after  :path,    &callbacks.method(:path)
+    Model.before :load,    &callbacks.method(:load)
+    Model.before :save,    &callbacks.method(:save)
+    Model.before :destroy, &callbacks.method(:destroy)
     
-    first = Post.first({:title => 'First'})
+    first = Model.first({:title => 'First'})
     lambda { first.save }.should raise_error
     lambda { first.destroy }.should raise_error
   end
