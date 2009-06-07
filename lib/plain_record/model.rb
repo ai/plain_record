@@ -28,6 +28,7 @@ module PlainRecord
     autoload :List,  (dir + 'list').to_s
     
     include PlainRecord::Callbacks
+    include PlainRecord::Filepath
     
     # Properties names.
     attr_reader :properties
@@ -39,7 +40,7 @@ module PlainRecord
     attr_reader :storage
     
     # Content of already loaded files.
-    attr_reader :loaded
+    attr_accessor :loaded
     
     # Load and return all entries in +file+.
     #
@@ -167,6 +168,7 @@ module PlainRecord
       @path = path
       self.extend PlainRecord::Model::Entry
       @loaded = {}
+      @texts = [] unless @texts
     end
     
     # Set glob +pattern+ for files with list of entries. Each file may contain

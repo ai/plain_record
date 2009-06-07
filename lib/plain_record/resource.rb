@@ -29,15 +29,19 @@ module PlainRecord
   # * <tt>save(entry)</tt> – write entry to file.
   # See PlainRecord::Callbacks for details.
   #
+  # You can define properties  from entry file path, by +in_filepath+ definer.
+  # See PlainRecord::Filepath for details.
+  #
   #   class Post
   #     include PlainRecord::Resource
   #     
-  #     entry_in '/content/*/post.m'
+  #     entry_in 'content/*/post.m'
   #     
   #     before :save do |enrty|
   #       entry.title = Time.now.to.s unless entry.title
   #     end
   #     
+  #     property :name, in_filepath(1)
   #     property :title
   #     text :summary
   #     text :content
@@ -56,21 +60,58 @@ module PlainRecord
     attr_reader :texts
     
     # File, where this object is stored.
-    attr_reader :file
+    attr_accessor :file
     
     # Create new model instance with YAML +data+ and +texts+ from +file+.
-    def initialize(file, data, texts = [])
+    def initialize(file = nil, data = {}, texts = [])
       self.class.use_callbacks(:load, self) do
+        if file.is_a? Hash
+          data = file
+          file = nil
+        end
+        
         @file = file
         @data = data
         @texts = texts
       end
     end
     
+    # Set path to entry storage. File should be in <tt>PlainRecord.root</tt> and
+    # can be relative.
+    def file=(value)
+      if PlainRecord.root != value.slice(0...PlainRecord.root.length)
+        value = File.join(PlainRecord.root, value)
+      end
+      
+      if :list == self.class.storage
+        self.class.loaded[@file].delete(self)
+        
+        self.class.loaded[value] = [] unless self.class.loaded.has_key? value
+        self.class.loaded[value] << self
+      else
+        self.class.loaded.delete(@file)
+        
+        self.class.loaded[value] = self
+      end
+      
+      @file = value
+    end
+    
+    # Return relative path to +file+ from <tt>PlainRecord.root</tt>.
+    def path
+      return nil unless @file
+      @file.slice(PlainRecord.root.length..-1)
+    end
+    
     # Save entry to file. Note, that for in_list models it also save all other
     # entries in file.
     def save
       self.class.use_callbacks(:save, self) do
+        unless @file
+          raise ArgumentError, "There isn't file to save entry. " +
+                                "Set filepath properties or file."
+        end
+        
         self.class.save_file(@file)
       end
     end

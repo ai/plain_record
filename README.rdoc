@@ -24,6 +24,7 @@ For example we will create simple blog storage with posts and comments.
        
        entry_in '*/post.m'
        
+       property :name, in_filepath(1)
        property :title
        property :tags
        text :summary
@@ -75,6 +76,8 @@ For example we will create simple blog storage with posts and comments.
    access for properties and text by methods with same name:
    
      post = Post.first(title: /first/)
+     post.file    #=> "data/first/post.m"
+     post.name    #=> "first"
      post.title   #=> "My first post"
      post.tags    #=> ["test", "first"]
      post.summary #=> "It is short post summary."

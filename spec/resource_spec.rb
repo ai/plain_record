@@ -20,6 +20,7 @@ describe PlainRecord::Resource do
   
   it "should remeber it file" do
     Post.load_file(FIRST).file.should == FIRST
+    Post.load_file(FIRST).path.should == 'data/1/post.m'
   end
   
   it "should save entry" do

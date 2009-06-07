@@ -1,10 +1,21 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe PlainRecord::Callbacks do
+  before :all do
+    module ::Fullname
+      include PlainRecord::Callbacks
+      
+      def fullname(first, second)
+        use_callbacks(:fullname, first, second) do
+          first + ' ' + second
+        end
+      end
+    end
+  end
   
   it "should use methods without callbacks" do
     klass = Class.new {
-      extend Fullname
+      extend ::Fullname
     }.fullname('John', 'Smith').should == 'John Smith'
   end
   
@@ -14,7 +25,7 @@ describe PlainRecord::Callbacks do
     checker.should_receive(:check_last).with('John', 'Smith').once.ordered
     
     klass = Class.new {
-      extend Fullname
+      extend ::Fullname
       
       before :fullname, 2, &checker.method(:check_last)
       before :fullname, 1, &checker.method(:check_first)
@@ -28,7 +39,7 @@ describe PlainRecord::Callbacks do
     end
     
     klass = Class.new {
-      extend Fullname
+      extend ::Fullname
       
       after :fullname, 2, &adder.method(:add_last)
       after :fullname, 1, &adder.method(:add_first)

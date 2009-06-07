@@ -23,12 +23,18 @@ require 'yaml'
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'version'
 require dir + 'callbacks'
+require dir + 'filepath'
 require dir + 'model'
 require dir + 'resource'
 
 module PlainRecord
   class << self
-    # Root of all file path in Model#entry_in.
+    # Root of all file path in Model#entry_in or Model#list_in.
     attr_accessor :root
+    
+    def root=(value) #:nodoc:
+      value += File::SEPARATOR if File::SEPARATOR != value[-1..-1]
+      @root = value
+    end
   end
 end

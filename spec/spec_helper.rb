@@ -19,24 +19,14 @@ class Author
   property :name
 end
 
-module Fullname
-  include PlainRecord::Callbacks
-  
-  def fullname(first, second)
-    use_callbacks(:fullname, first, second) do
-      first + ' ' + second
-    end
-  end
-end
-
 PlainRecord.root = File.dirname(__FILE__)
 
 FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
 SECOND = File.join(File.dirname(__FILE__), 'data/2/post.m')
 THIRD  = File.join(File.dirname(__FILE__), 'data/3/post.m')
-FIRST_POST = Post.load_file(FIRST)
+FIRST_POST  = Post.load_file(FIRST)
 SECOND_POST = Post.load_file(SECOND)
-THIRD_POST = Post.load_file(THIRD)
+THIRD_POST  = Post.load_file(THIRD)
 
 INTERN = File.join(File.dirname(__FILE__), 'data/authors/intern.yml')
 EXTERN = File.join(File.dirname(__FILE__), 'data/authors/extern.yml')

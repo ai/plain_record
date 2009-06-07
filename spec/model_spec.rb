@@ -119,7 +119,7 @@ describe PlainRecord::Model do
   end
   
   it "should load all entries" do
-    Post.all.should == [SECOND_POST, THIRD_POST, FIRST_POST]
+    Post.all.should =~ [SECOND_POST, THIRD_POST, FIRST_POST]
   end
   
   it "should return entries by string matcher" do
@@ -131,7 +131,7 @@ describe PlainRecord::Model do
   end
   
   it "should return entries by search proc" do
-    Post.all { |i| not i.title.nil? }.should == [THIRD_POST, FIRST_POST]
+    Post.all { |i| not i.title.nil? }.should =~ [THIRD_POST, FIRST_POST]
   end
   
   it "should return all list entries" do
@@ -147,7 +147,7 @@ describe PlainRecord::Model do
   end
   
   it "should return entry by regexp matcher" do
-    Post.first(:title => /First|Third/).should == THIRD_POST
+    Post.first(:title => /First/).should == FIRST_POST
   end
   
   it "should return entry by search proc" do
