@@ -59,6 +59,17 @@ describe PlainRecord::Resource do
     Post.first(:title => 'First').destroy
   end
   
+  it "should save entry without file if model use only one file" do
+    class Model
+      include PlainRecord::Resource
+      list_in 'file.yml'
+    end
+    
+    path = File.join(PlainRecord.root, 'file.yml')
+    File.should_receive(:open).with(path, 'w').and_yield(StringIO.new)
+    Model.new.save
+  end
+  
   it "should delete list entry" do
     file = StringIO.new
     File.should_receive(:open).with(INTERN, 'w').and_yield(file)

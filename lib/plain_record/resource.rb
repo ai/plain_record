@@ -84,12 +84,12 @@ module PlainRecord
       end
       
       if :list == self.class.storage
-        self.class.loaded[@file].delete(self)
+        self.class.loaded[@file].delete(self) if @file
         
         self.class.loaded[value] = [] unless self.class.loaded.has_key? value
         self.class.loaded[value] << self
       else
-        self.class.loaded.delete(@file)
+        self.class.loaded.delete(@file) if @file
         
         self.class.loaded[value] = self
       end
@@ -108,8 +108,12 @@ module PlainRecord
     def save
       self.class.use_callbacks(:save, self) do
         unless @file
-          raise ArgumentError, "There isn't file to save entry. " +
-                                "Set filepath properties or file."
+          unless self.class.path =~ /[\*\[\?\{]/
+            self.file = self.class.path
+          else
+            raise ArgumentError, "There isn't file to save entry. " +
+                                 "Set filepath properties or file."
+          end
         end
         
         self.class.save_file(@file)
