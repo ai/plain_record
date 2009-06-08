@@ -49,7 +49,7 @@ For example we will create simple blog storage with posts and comments.
        
        list_in '*/comments.yml'
        
-       property :name
+       property :author
        property :comment
      end
    

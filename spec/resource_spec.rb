@@ -64,7 +64,7 @@ describe PlainRecord::Resource do
       list_in 'file.yml'
     end
     
-    path = File.join(PlainRecord.root, 'file.yml')
+    path = PlainRecord.root('file.yml')
     File.should_receive(:open).with(path, 'w').and_yield(StringIO.new)
     Model.new.save
   end

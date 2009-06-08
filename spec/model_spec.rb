@@ -179,15 +179,14 @@ describe PlainRecord::Model do
   it "should move entry from one file to another" do
     first = Post.first(:title => 'First')
     Post.should_receive(:delete_file).with(FIRST)
-    Post.should_receive(:save_file).with(File.join(PlainRecord.root, 'file'))
+    Post.should_receive(:save_file).with(PlainRecord.root('file'))
     first.file = 'file'
     first.save
   end
   
   it "should move list entry from one file to another" do
-    path = File.join(PlainRecord.root, 'file')
     Author.should_receive(:save_file).with(INTERN).once
-    Author.should_receive(:save_file).with(path).twice
+    Author.should_receive(:save_file).with(PlainRecord.root('file')).twice
     Author.should_receive(:delete_file).with(INTERN).once
     
     authors = Author.all(:login => /john|ivan/)

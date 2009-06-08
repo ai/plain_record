@@ -78,7 +78,7 @@ module PlainRecord
     # can be relative.
     def file=(value)
       if PlainRecord.root != value.slice(0...PlainRecord.root.length)
-        value = File.join(PlainRecord.root, value)
+        value = PlainRecord.root(value)
       end
       
       if @file != value

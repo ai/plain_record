@@ -113,7 +113,7 @@ module PlainRecord
     
     # Return all file list for models, which match for +matchers+.
     def files(matchers = {})
-      Dir.glob(File.join(PlainRecord.root, path(matchers)))
+      Dir.glob(PlainRecord.root(path(matchers)))
     end
     
     # Return glob pattern to for files with entris, which is may be match for

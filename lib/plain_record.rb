@@ -29,12 +29,20 @@ require dir + 'resource'
 
 module PlainRecord
   class << self
-    # Root of all file path in Model#entry_in or Model#list_in.
-    attr_accessor :root
-    
-    def root=(value) #:nodoc:
+    # Set new root for Model#entry_in or Model#list_in.
+    #
+    # Note, that it add last slash to root path (<tt>/content</tt> will be saved
+    # as <tt>/content/</tt>).
+    def root=(value)
       value += File::SEPARATOR if File::SEPARATOR != value[-1..-1]
       @root = value
+    end
+    
+    # Return root for Model#entry_in or Model#list_in.
+    # 
+    # If you set +path+ it will be added to root path.
+    def root(path = '')
+      File.join(@root, path)
     end
   end
 end
