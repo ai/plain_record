@@ -1,4 +1,4 @@
-- login: john
-  name:  John Smith
-- login: ivan
-  name:  Ivan Ivanov
+- name:  John Smith
+  login: john
+- name:  Ivan Ivanov
+  login: ivan

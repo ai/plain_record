@@ -32,13 +32,13 @@ INTERN = File.join(File.dirname(__FILE__), 'data/authors/intern.yml')
 EXTERN = File.join(File.dirname(__FILE__), 'data/authors/extern.yml')
 
 def model_methods(model)
-    model.instance_methods - Object.instance_methods -
-        PlainRecord::Resource.instance_methods
+    (model.instance_methods - Object.instance_methods -
+        PlainRecord::Resource.instance_methods).map { |i| i.to_s }
 end
 
 Spec::Matchers.define :has_methods do |*methods|
   match do |model|
-    model_methods(model).sort == methods.sort
+    model_methods(model).sort == methods.map! { |i| i.to_s }.sort
   end
 end
 
