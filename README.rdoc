@@ -24,7 +24,7 @@ For example we will create simple blog storage with posts and comments.
        
        entry_in '*/post.m'
        
-       property :name, in_filepath(1)
+       virtual :name, in_filepath(1)
        property :title
        property :tags
        text :summary

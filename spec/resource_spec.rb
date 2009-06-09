@@ -86,20 +86,20 @@ describe PlainRecord::Resource do
   end
   
   it "should call callbacks" do
-    Model = Post.dup
+    Callbacked = Post.dup
     callbacks = mock()
-    callbacks.should_receive(:path).with(Model.path, {:title => 'First'}).
+    callbacks.should_receive(:path).with(Callbacked.path, {:title => 'First'}).
                                     and_return('data/1/post.m')
-    callbacks.should_receive(:load).with(an_instance_of(Model))
-    callbacks.should_receive(:save).with(an_instance_of(Model)).and_raise
-    callbacks.should_receive(:destroy).with(an_instance_of(Model)).and_raise
+    callbacks.should_receive(:load).with(an_instance_of Callbacked)
+    callbacks.should_receive(:save).with(an_instance_of Callbacked).and_raise
+    callbacks.should_receive(:destroy).with(an_instance_of Callbacked).and_raise
     
-    Model.after  :path,    &callbacks.method(:path)
-    Model.before :load,    &callbacks.method(:load)
-    Model.before :save,    &callbacks.method(:save)
-    Model.before :destroy, &callbacks.method(:destroy)
+    Callbacked.after  :path,    &callbacks.method(:path)
+    Callbacked.before :load,    &callbacks.method(:load)
+    Callbacked.before :save,    &callbacks.method(:save)
+    Callbacked.before :destroy, &callbacks.method(:destroy)
     
-    first = Model.first({:title => 'First'})
+    first = Callbacked.first({:title => 'First'})
     lambda { first.save }.should raise_error
     lambda { first.destroy }.should raise_error
   end

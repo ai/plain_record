@@ -30,11 +30,14 @@ module PlainRecord
     include PlainRecord::Callbacks
     include PlainRecord::Filepath
     
-    # Properties names.
+    # YAML properties names.
     attr_reader :properties
     
     # Name of special properties with big text.
     attr_reader :texts
+    
+    # Properties names with dynamic value.
+    attr_reader :virtuals
     
     # Storage type: +:entry+ or +:list+.
     attr_reader :storage
@@ -190,7 +193,34 @@ module PlainRecord
       @loaded = {}
     end
     
-    # Add property to model with some +name+. It will be stored as YAML.
+    # Add virtual property with some +name+ to model. It value willn’t be in
+    # file and will be calculated dynamically.
+    #
+    # You _must_ provide your own define logic by +definers+. Definer Proc
+    # will be call with property name in first argument and may return
+    # +:accessor+, +:writer+ or +:reader+ this method create standard methods
+    # to access to property.
+    # 
+    #   class Post
+    #     include PlainRecord::Resource
+    #
+    #     entry_in 'posts/*/post.m'
+    #
+    #     virtual :name, in_filepath(1)
+    #   end
+    def virtual(name, *definers)
+      @virtuals ||= []
+      @virtuals << name
+      
+      accessors = call_definers(definers, name, :virtual)
+      
+      if accessors[:reader] or accessors[:writer]
+        raise ArgumentError, 'You must provide you own accessors for virtual ' +
+                             "property #{name}"
+      end
+    end
+    
+    # Add property with some +name+ to model. It will be stored as YAML.
     #
     # You can provide your own define logic by +definers+. Definer Proc
     # will be call with property name in first argument and may return
@@ -208,7 +238,7 @@ module PlainRecord
       @properties ||= []
       @properties << name
       
-      accessors = call_definers(definers, name)
+      accessors = call_definers(definers, name, :property)
       
       if accessors[:reader]
         class_eval <<-EOS, __FILE__, __LINE__
@@ -267,7 +297,7 @@ module PlainRecord
       @texts << name
       number = @texts.length - 1
       
-      accessors = call_definers(definers, name)
+      accessors = call_definers(definers, name, :text)
       
       if accessors[:reader]
         class_eval <<-EOS, __FILE__, __LINE__
@@ -285,13 +315,14 @@ module PlainRecord
       end
     end
     
-    # Call +definers+ for property with +name+ and return accessors, which will
+    # Call +definers+ from +caller+ (<tt>virtual</tt>, <tt>:property</tt> or
+    # <tt>:text</tt>) for property with +name+ and return accessors, which will
     # be created as standart by +property+ or +text+ method.
-    def call_definers(definers, name)
+    def call_definers(definers, name, caller)
       accessors = {:reader => true, :writer => true}
       
       definers.each do |definer|
-        access = definer.call(name)
+        access = definer.call(name, caller)
         if :writer == access or access.nil?
           accessors[:reader] = false
         end

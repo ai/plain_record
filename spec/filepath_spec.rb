@@ -8,11 +8,21 @@ describe PlainRecord::Filepath do
       
       entry_in 'data/**/*/post.m'
       
-      property :category, in_filepath(1)
-      property :id,       in_filepath(2)
+      virtual :category, in_filepath(1)
+      virtual :id,       in_filepath(2)
       
       property :title
     end
+  end
+  
+  it "shouldn't create non-virtual filepath property" do
+    lambda {
+      Class.new do
+        include PlainRecord::Resource
+        entry_in 'data/*/post.m'
+        property :category, in_filepath(1)
+      end
+    }.should raise_error(ArgumentError, /virtual creator/)
   end
   
   it "should load filepath property" do

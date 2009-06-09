@@ -26,7 +26,7 @@ module PlainRecord
   # To define filepath property:
   # 1. Use <tt>*</tt> or <tt>**</tt> pattern in model path in +enrty_in+ or
   #    +list_in+.
-  # 2. In +property+ method use <tt>in_filepath(i)</tt> definer after name with
+  # 2. In +virtual+ method use <tt>in_filepath(i)</tt> definer after name with
   #    <tt>*</tt> or <tt>**</tt> number (start from 1).
   # 
   # Define filepath property only after +entry_in+ or +list_in+ call.
@@ -36,8 +36,8 @@ module PlainRecord
   #     
   #     entry_in '*/*/post.m'
   #     
-  #     property :category, in_filepath(1)
-  #     property :name,     in_filepath(1)
+  #     virtual :category, in_filepath(1)
+  #     virtual :name,     in_filepath(1)
   #     …
   #   end
   #   
@@ -56,8 +56,13 @@ module PlainRecord
     # Return definer for filepath property for +number+ <tt>*</tt> or
     # <tt>**</tt> pattern in path.
     def in_filepath(number)
-      proc do |property|
+      proc do |property, caller|
+        if :virtual != caller
+          raise ArgumentError, "You must create filepath property #{property}" +
+                               ' virtual creator'
+        end
         PlainRecord::Filepath.define_property(self, property, number)
+        nil
       end
     end
     

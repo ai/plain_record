@@ -41,7 +41,7 @@ module PlainRecord
   #       entry.title = Time.now.to.s unless entry.title
   #     end
   #     
-  #     property :name, in_filepath(1)
+  #     virtual :name, in_filepath(1)
   #     property :title
   #     text :summary
   #     text :content

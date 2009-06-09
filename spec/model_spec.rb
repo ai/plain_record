@@ -7,6 +7,24 @@ describe PlainRecord::Model do
     Author.loaded = {}
   end
   
+  it "should define virtual property" do
+    klass = Class.new do
+      include PlainRecord::Resource
+      virtual :one, Definers.none
+    end
+    
+    klass.virtuals.should == [:one]
+  end
+  
+  it "shouldn't define virtual property without accessor from definers" do
+    lambda {
+      Class.new do
+        include PlainRecord::Resource
+        virtual :one, Definers.reader
+      end
+    }.should raise_error(ArgumentError, /own accessors/)
+  end
+  
   it "should define property" do
     klass = Class.new do
       include PlainRecord::Resource
@@ -54,12 +72,16 @@ describe PlainRecord::Model do
     klass.should has_methods(:two)
   end
   
-  it "should send property name to definer" do
+  it "should send property name and caller type to definer" do
     definer = mock
-    definer.stub!(:accessor).with(:one)
+    definer.stub!(:virtual).with(:one, :virtual)
+    definer.stub!(:property).with(:two, :property)
+    definer.stub!(:text).with(:three, :text)
     klass = Class.new do
       include PlainRecord::Resource
-      property :one, definer.method(:accessor)
+      virtual :one, definer.method(:virtual)
+      property :two, definer.method(:property)
+      text :three, definer.method(:text)
     end
   end
   
