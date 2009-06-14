@@ -68,7 +68,6 @@ describe PlainRecord::Model do
       property :one, Definers.writer, Definers.reader, Definers.accessor
       text :two, Definers.reader
     end
-    p model_methods(klass)
     klass.should has_methods(:two)
   end
   

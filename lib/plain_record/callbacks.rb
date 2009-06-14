@@ -24,7 +24,7 @@ module PlainRecord
     # Hash of class callbacks with property.
     attr_accessor :callbacks
     
-    # Set block as callback before +event+. Callback with less +priority+ will
+    # Set block as callback before +events+. Callback with less +priority+ will
     # start earlier.
     #
     #   class File
@@ -51,11 +51,13 @@ module PlainRecord
     #       raise ArgumentError if 255 < @name.length
     #     end
     #   end
-    def before(event, priority = 1, &block)
-      add_callback(:before, event, priority, block)
+    def before(events, priority = 1, &block)
+      Array(events).each do |event|
+        add_callback(:before, event, priority, block)
+      end
     end
     
-    # Set block as callback after +event+. Callback with less +priority+ will
+    # Set block as callback after +events+. Callback with less +priority+ will
     # start earlier.
     #
     # After callbacks may change method return, which will be pass as first
@@ -83,8 +85,10 @@ module PlainRecord
     #   end
     #
     #   GreatPerson.new.name #=> "The Great John"
-    def after(event, priority = 1, &block)
-      add_callback(:after, event, priority, block)
+    def after(events, priority = 1, &block)
+      Array(events).each do |event|
+        add_callback(:after, event, priority, block)
+      end
     end
     
     # Call before callback for +event+, run block and give it result to
