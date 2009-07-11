@@ -29,21 +29,29 @@ module PlainRecord
     
     include PlainRecord::Callbacks
     include PlainRecord::Filepath
+    include PlainRecord::Associations
     
     # YAML properties names.
-    attr_reader :properties
+    attr_accessor :properties
     
     # Name of special properties with big text.
-    attr_reader :texts
+    attr_accessor :texts
     
     # Properties names with dynamic value.
-    attr_reader :virtuals
+    attr_accessor :virtuals
     
     # Storage type: +:entry+ or +:list+.
     attr_reader :storage
     
     # Content of already loaded files.
     attr_accessor :loaded
+    
+    def self.extended(base) #:nodoc:
+      base.properties = []
+      base.virtuals = []
+      base.texts = []
+      base.loaded = {}
+    end
     
     # Load and return all entries in +file+.
     #
@@ -175,8 +183,6 @@ module PlainRecord
       @storage = :entry
       @path = path
       self.extend PlainRecord::Model::Entry
-      @loaded = {}
-      @texts = [] unless @texts
     end
     
     # Set glob +pattern+ for files with list of entries. Each file may contain
@@ -190,7 +196,6 @@ module PlainRecord
       @storage = :list
       @path = path
       self.extend PlainRecord::Model::List
-      @loaded = {}
     end
     
     # Add virtual property with some +name+ to model. It value willn’t be in
@@ -315,7 +320,7 @@ module PlainRecord
       end
     end
     
-    # Call +definers+ from +caller+ (<tt>virtual</tt>, <tt>:property</tt> or
+    # Call +definers+ from +caller+ (<tt>:virtual</tt>, <tt>:property</tt> or
     # <tt>:text</tt>) for property with +name+ and return accessors, which will
     # be created as standart by +property+ or +text+ method.
     def call_definers(definers, name, caller)

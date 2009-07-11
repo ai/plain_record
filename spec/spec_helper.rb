@@ -10,6 +10,18 @@ class Post
   text :content
 end
 
+
+class FilepathPost
+  include PlainRecord::Resource
+  
+  entry_in 'data/**/*/post.m'
+  
+  virtual :category, in_filepath(1)
+  virtual :name,     in_filepath(2)
+  
+  property :title
+end
+
 class Author
   include PlainRecord::Resource
   

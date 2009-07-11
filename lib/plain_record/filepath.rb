@@ -61,7 +61,7 @@ module PlainRecord
           raise ArgumentError, "You must create filepath property #{property}" +
                                ' virtual creator'
         end
-        PlainRecord::Filepath.define_property(self, property, number)
+        Filepath.define_property(self, property, number)
         nil
       end
     end

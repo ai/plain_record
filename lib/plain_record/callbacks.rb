@@ -91,6 +91,25 @@ module PlainRecord
       end
     end
     
+    # Call +before+ callbacks for +event+ with +params+. In your
+    # code use more pretty +use_callbacks+ method.
+    def call_before_callbacks(event, params)
+      init_callbacks(event)
+      @callbacks[:before][event].each do |before, priority|
+        before.call(*params)
+      end
+    end
+    
+    # Call +before+ callbacks for +event+ with +params+. Callbacks can change 
+    # +result+. In your code use more pretty +use_callbacks+ method.
+    def call_after_callbacks(event, result, params)
+      init_callbacks(event)
+      @callbacks[:after][event].each do |after, priority|
+        result = after.call(result, *params)
+      end
+      result
+    end
+    
     # Call before callback for +event+, run block and give it result to
     # after callbacks.
     #
@@ -100,18 +119,9 @@ module PlainRecord
     #     end
     #   end
     def use_callbacks(event, *params, &block)
-      init_callbacks(event)
-      
-      @callbacks[:before][event].each do |before, priority|
-        before.call(*params)
-      end
-        
+      call_before_callbacks(event, params)
       result = yield
-      
-      @callbacks[:after][event].each do |after, priority|
-        result = after.call(result, *params)
-      end
-      result
+      call_after_callbacks(event, result, params)
     end
     
     private
