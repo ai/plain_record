@@ -2,7 +2,7 @@
 Plaint Record is a data persistence, which use human editable and readable plain
 text files. It’s ideal for static generated sites, like blog or homepage.
 
-If you want to write another static website generator, you didn’t need to write
+If you want to write another static website generator, you don’t need to write
 another file parser – you can use Plain Record.
 
 == How To
