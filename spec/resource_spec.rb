@@ -47,10 +47,10 @@ describe PlainRecord::Resource do
     john.save
 
     file.rewind
-    file.read.should == "- name: John Smith\n" +
-                        "  login: john\n" +
-                        "- name: Ivan Ivanov\n" +
-                        "  login: ivan\n"
+    YAML.load(file.read).should == [
+      { 'name' => 'John Smith',  'login' => 'john' },
+      { 'name' => 'Ivan Ivanov', 'login' => 'ivan' }
+    ]
   end
 
   it "should delete entry" do
@@ -78,8 +78,9 @@ describe PlainRecord::Resource do
 
     Author.first(:login => 'john').should be_nil
     file.rewind
-    file.read.should == "- name: Ivan Ivanov\n" +
-                        "  login: ivan\n"
+    YAML.load(file.read).should == [
+      { 'name' => 'Ivan Ivanov', 'login' => 'ivan' }
+    ]
 
     Author.should_receive(:delete_file).with(INTERN)
     Author.first(:login => 'ivan').destroy
