@@ -31,7 +31,7 @@ module PlainRecord
         @loaded[file]
       end
 
-      def each_entry(matcher = {})
+      def each_entry(matcher = { })
         files(matcher).each do |file|
           yield load_file(file)
         end
@@ -51,7 +51,7 @@ module PlainRecord
 
       private
 
-      def all_entries(matcher = {})
+      def all_entries(matcher = { })
         files(matcher).map { |file| load_file(file) }
       end
 

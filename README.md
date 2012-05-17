@@ -29,7 +29,7 @@ For example we will create simple blog storage with posts and comments.
     class Post
       include Plain::Resource
 
-      entry_in '*/post.m'
+      entry_in '*/post.md'
 
       virtual  :name,     in_filepath(1)
       virtual  :comments, many(Comment)
@@ -40,7 +40,7 @@ For example we will create simple blog storage with posts and comments.
     end
      ```
 
-4. Create new post file `data/first/post.m`. Properties will be saved as
+4. Create new post file `data/first/post.md`. Properties will be saved as
    YAML and text will be placed as plain text, which is separated by 3 dashes:
 
      ```
@@ -94,7 +94,7 @@ For example we will create simple blog storage with posts and comments.
 
      ```ruby
     post = Post.first(title: /first/)
-    post.file    #=> "data/first/post.m"
+    post.file    #=> "data/first/post.md"
     post.name    #=> "first"
     post.title   #=> "My first post"
     post.tags    #=> ["test", "first"]

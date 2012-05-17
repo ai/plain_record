@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module PlainRecord
   # Extention to get properties from enrty file path. For example, your blog
-  # post may stored in <tt>_name_/post.m</tt>, and post model will have +name+
+  # post may stored in <tt>_name_/post.md</tt>, and post model will have +name+
   # property. Also if you set name property to Model#first or Model#all method,
   # they will load entry directly only by it file.
   #
@@ -34,7 +34,7 @@ module PlainRecord
   #   class Post
   #     include PlainRecord::Resource
   #
-  #     entry_in '*/*/post.m'
+  #     entry_in '*/*/post.md'
   #
   #     virtual :category, in_filepath(1)
   #     virtual :name,     in_filepath(1)
@@ -44,7 +44,7 @@ module PlainRecord
   #   superpost = Post.new
   #   superpost.name = 'superpost'
   #   superpost.category = 'best/'
-  #   superpost.save                     # Save to best/superpost/post.m
+  #   superpost.save               # Save to best/superpost/post.md
   #
   #   bests = Post.all(category: 'best') # Look up only in best/ dir
   module Filepath
@@ -70,10 +70,10 @@ module PlainRecord
       # Define class variables and events in +klass+. It should be call once on
       # same class after +entry_in+ or +list_in+ call.
       def install(klass)
-        klass.filepath_properties = {}
+        klass.filepath_properties = { }
 
         path = Regexp.escape(klass.path).gsub(/\\\*\\\*(\/|$)/, '(.*)').
-                                          gsub('\\*', '([^/]+)')
+                                         gsub('\\*', '([^/]+)')
         klass.filepath_regexp = Regexp.new(path)
 
         klass.class_eval do
@@ -83,12 +83,12 @@ module PlainRecord
         klass.after :load do |result, entry|
           if entry.path
             data = klass.filepath_regexp.match(entry.path)
-            entry.filepath_data = {}
+            entry.filepath_data = { }
             klass.filepath_properties.each_pair do |number, name|
               entry.filepath_data[name] = data[number]
             end
           else
-            entry.filepath_data = {}
+            entry.filepath_data = { }
             klass.filepath_properties.each_value do |name|
               entry.filepath_data[name] = entry.data[name]
               entry.data.delete(name)

@@ -6,7 +6,7 @@ describe PlainRecord::Filepath do
     lambda {
       Class.new do
         include PlainRecord::Resource
-        entry_in 'data/*/post.m'
+        entry_in 'data/*/post.md'
         property :category, in_filepath(1)
       end
     }.should raise_error(ArgumentError, /virtual creator/)
@@ -23,11 +23,11 @@ describe PlainRecord::Filepath do
   end
 
   it "should return more accurate path by filepath properties" do
-    FilepathPost.path(:name => 2).should == 'data/**/2/post.m'
+    FilepathPost.path(:name => 2).should == 'data/**/2/post.md'
   end
 
   it "should use filepath properties in search" do
-    FilepathPost.loaded = {}
+    FilepathPost.loaded = { }
     FilepathPost.all(:category => 'best/')
     FilepathPost.loaded.should have(1).keys
   end
@@ -39,7 +39,7 @@ describe PlainRecord::Filepath do
   end
 
   it "should get entry path by filepath properties" do
-    path = File.join(File.dirname(__FILE__), 'data/5/post.m')
+    path = File.join(File.dirname(__FILE__), 'data/5/post.md')
     post = FilepathPost.new(:name => 5, :category => '')
     FilepathPost.should_receive(:move_entry).with(post, nil, path)
     post.save

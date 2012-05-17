@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), '../lib/plain_record')
 class Post
   include PlainRecord::Resource
 
-  entry_in 'data/*/post.m'
+  entry_in 'data/*/post.md'
 
   property :title
   text :summary
@@ -13,7 +13,7 @@ end
 class FilepathPost
   include PlainRecord::Resource
 
-  entry_in 'data/**/*/post.m'
+  entry_in 'data/**/*/post.md'
 
   virtual :category, in_filepath(1)
   virtual :name,     in_filepath(2)
@@ -33,9 +33,9 @@ end
 
 PlainRecord.root = File.dirname(__FILE__)
 
-FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.m')
-SECOND = File.join(File.dirname(__FILE__), 'data/2/post.m')
-THIRD  = File.join(File.dirname(__FILE__), 'data/3/post.m')
+FIRST  = File.join(File.dirname(__FILE__), 'data/1/post.md')
+SECOND = File.join(File.dirname(__FILE__), 'data/2/post.md')
+THIRD  = File.join(File.dirname(__FILE__), 'data/3/post.md')
 FIRST_POST  = Post.load_file(FIRST)
 SECOND_POST = Post.load_file(SECOND)
 THIRD_POST  = Post.load_file(THIRD)

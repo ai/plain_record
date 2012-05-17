@@ -35,7 +35,7 @@ module PlainRecord
   #   class Post
   #     include PlainRecord::Resource
   #
-  #     entry_in 'content/*/post.m'
+  #     entry_in 'content/*/post.md'
   #
   #     before :save do |enrty|
   #       entry.title = Time.now.to.s unless entry.title
@@ -63,7 +63,7 @@ module PlainRecord
     attr_accessor :file
 
     # Create new model instance with YAML +data+ and +texts+ from +file+.
-    def initialize(file = nil, data = {}, texts = [])
+    def initialize(file = nil, data = { }, texts = [])
       self.class.use_callbacks(:load, self) do
         texts, data = data, nil if data.is_a? Array
         data,  file = file, nil if file.is_a? Hash
@@ -118,7 +118,7 @@ module PlainRecord
     end
 
     # Return string of YAML representation of entry +data+.
-    def to_yaml(opts = {})
+    def to_yaml(opts = { })
       @data.to_yaml(opts)
     end
 

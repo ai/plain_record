@@ -40,7 +40,7 @@ module PlainRecord
   #   class Review
   #     include PlainRecord::Resource
   #
-  #     entry_in 'reviews/*.m'
+  #     entry_in 'reviews/*.md'
   #
   #     virtual  :author, one(Author)
   #     property :author_login
@@ -77,7 +77,7 @@ module PlainRecord
   #   class Review
   #     include PlainRecord::Resource
   #
-  #     entry_in 'reviews/*.m'
+  #     entry_in 'reviews/*.md'
   #
   #     property :author
   #     property :movie, one(Movie)
@@ -108,7 +108,7 @@ module PlainRecord
 
     # Return definer for one-to-one association with +klass+. Have different
     # logic in +property+ and +virtual+ methods.
-    def one(klass, map = {})
+    def one(klass, map = { })
       proc do |property, caller|
         if :property == caller
           Associations.define_real_one(self, property, klass)
@@ -126,7 +126,7 @@ module PlainRecord
 
     # Return definer for one-to-many or many-to-many association with +klass+.
     # Have different login in +property+ and +virtual+ methods.
-    def many(klass, prefix = nil, map = {})
+    def many(klass, prefix = nil, map = { })
       proc do |property, caller|
         if :property == caller
           Associations.define_real_many(self, property, klass)
@@ -204,7 +204,7 @@ module PlainRecord
       #   Associations.map(Comment, Post, :post) #=> { :post_name => :name }
       def map(from, to, prefix)
         from_fields = (from.properties + from.virtuals).map { |i| i.to_s }
-        mapped = {}
+        mapped = { }
         (to.properties + to.virtuals).each do |to_field|
           from_field = prefix + to_field.to_s
           if from_fields.include? from_field
@@ -217,8 +217,8 @@ module PlainRecord
       # Define that virtual property +name+ in +klass+ contain link to +model+
       # witch is finded by +map+.
       def define_link_one(klass, model, name, map)
-        klass.association_cache ||= {}
-        klass.association_maps ||= {}
+        klass.association_cache ||= { }
+        klass.association_maps  ||= { }
         klass.association_maps[name] = map
 
         klass.class_eval <<-EOS, __FILE__, __LINE__
@@ -244,8 +244,8 @@ module PlainRecord
       # Define that virtual property +name+ in +klass+ contain links to +model+
       # witch are finded by +map+.
       def define_link_many(klass, model, name, map)
-        klass.association_cache ||= {}
-        klass.association_maps ||= {}
+        klass.association_cache ||= { }
+        klass.association_maps  ||= { }
         klass.association_maps[name] = map
 
         klass.class_eval <<-EOS, __FILE__, __LINE__

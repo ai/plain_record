@@ -30,7 +30,7 @@ module PlainRecord
         @loaded[file]
       end
 
-      def each_entry(matcher = {})
+      def each_entry(matcher = { })
         files(matcher).each do |file|
           load_file(file).each do |entry|
             yield entry
@@ -62,7 +62,7 @@ module PlainRecord
 
       private
 
-      def all_entries(matcher = {})
+      def all_entries(matcher = { })
         files(matcher).map { |file| load_file(file) }.flatten
       end
 

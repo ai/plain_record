@@ -3,8 +3,8 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe PlainRecord::Model do
 
   after :each do
-    Post.loaded   = {}
-    Author.loaded = {}
+    Post.loaded   = { }
+    Author.loaded = { }
   end
 
   it "should define virtual property" do
@@ -32,7 +32,7 @@ describe PlainRecord::Model do
     end
 
     klass.properties.should == [:one]
-    object = klass.new(nil, {'one' => 1})
+    object = klass.new(nil, { 'one' => 1 })
     object.one.should == 1
     object.one = 2
     object.one.should == 2
@@ -45,7 +45,7 @@ describe PlainRecord::Model do
     end
 
     klass.texts.should == [:content]
-    object = klass.new(nil, {}, ['text'])
+    object = klass.new(nil, { }, ['text'])
     object.content.should == 'text'
     object.content = 'another'
     object.content.should == 'another'
@@ -87,7 +87,7 @@ describe PlainRecord::Model do
   it "should find all enrty files by glob pattern" do
     klass = Class.new do
       include PlainRecord::Resource
-      entry_in 'data/*/post.m'
+      entry_in 'data/*/post.md'
     end
     klass.storage.should == :entry
     klass.files.sort.should == [FIRST, SECOND, THIRD]

@@ -9,7 +9,7 @@ describe PlainRecord::Associations do
 
     class ::RatedPost
       include PlainRecord::Resource
-      entry_in 'data/3/post.m'
+      entry_in 'data/3/post.md'
       property :rate, one(::Rate)
     end
 
@@ -28,7 +28,7 @@ describe PlainRecord::Associations do
 
     class ::CommentedPost
       include PlainRecord::Resource
-      entry_in 'data/*/post.m'
+      entry_in 'data/*/post.md'
       virtual :name,     in_filepath(1)
       virtual :comments, many(::Comment)
     end
@@ -53,8 +53,8 @@ describe PlainRecord::Associations do
   it "should load one-to-one real association" do
     rate = ::RatedPost.first().rate
     rate.should be_instance_of(::Rate)
-    rate.path.should == 'data/3/post.m'
-    rate.data.should == {'subject' => 5, 'text' => 2}
+    rate.path.should == 'data/3/post.md'
+    rate.data.should == { 'subject' => 5, 'text' => 2 }
   end
 
   it "should save one-to-one real association" do
@@ -72,8 +72,9 @@ describe PlainRecord::Associations do
     root.should have(1).answers
     root.answers[0].should be_instance_of(::Comment)
     root.answers[0].path.should == 'data/1/comments.yml'
-    root.answers[0].data.should == {'author_name' => 'john', 'text' => 'Thanks',
-                                    'answers' => []}
+    root.answers[0].data.should == { 'author_name' => 'john',
+                                     'text'        => 'Thanks',
+                                     'answers'     => [] }
   end
 
   it "should save one-to-many real association" do

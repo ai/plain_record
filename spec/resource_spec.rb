@@ -3,8 +3,8 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe PlainRecord::Resource do
 
   after :each do
-    Post.loaded   = {}
-    Author.loaded = {}
+    Post.loaded   = { }
+    Author.loaded = { }
   end
 
   it "should compare two object" do
@@ -18,7 +18,7 @@ describe PlainRecord::Resource do
 
   it "should remeber it file" do
     Post.load_file(FIRST).file.should == FIRST
-    Post.load_file(FIRST).path.should == 'data/1/post.m'
+    Post.load_file(FIRST).path.should == 'data/1/post.md'
   end
 
   it "should save entry" do
@@ -86,7 +86,7 @@ describe PlainRecord::Resource do
   it "should call callbacks" do
     class Callbacked
       include PlainRecord::Resource
-      entry_in 'data/*/post.m'
+      entry_in 'data/*/post.md'
       property :title
       text :summary
       text :content
@@ -94,7 +94,7 @@ describe PlainRecord::Resource do
 
     callbacks  = mock()
     callbacks.should_receive(:path).
-      with(Callbacked.path, { :title => 'First' }).and_return('data/1/post.m')
+      with(Callbacked.path, { :title => 'First' }).and_return('data/1/post.md')
     callbacks.should_receive(:load).with(an_instance_of Callbacked)
     callbacks.should_receive(:save).with(an_instance_of Callbacked).and_raise
     callbacks.should_receive(:destroy).with(an_instance_of Callbacked).and_raise

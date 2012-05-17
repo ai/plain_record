@@ -63,7 +63,7 @@ module PlainRecord
     # to break this loop somewhere in the middle (for example, like +first+).
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
-    def each_entry(matchers = {}); end
+    def each_entry(matchers = { }); end
 
     # Delete +entry+ from +file+.
     #
@@ -93,7 +93,7 @@ module PlainRecord
     #   Post.all(title: 'Post title')
     #   Post.all(title: /^Post/, summary: /cool/)
     #   Post.all { |post| 20 < Post.content.length }
-    def all(matchers = {}, &block)
+    def all(matchers = { }, &block)
       entries = all_entries(matchers)
       entries.delete_if { |i| not match(i, matchers) } if matchers
       entries.delete_if { |i| not block.call(i) }      if block_given?
@@ -109,7 +109,7 @@ module PlainRecord
     #   Post.first(title: 'Post title')
     #   Post.first(title: /^Post/, summary: /cool/)
     #   Post.first { |post| 2 < Post.title.length }
-    def first(matchers = {}, &block)
+    def first(matchers = { }, &block)
       if matchers and block_given?
         each_entry(matchers) do |i|
           return i if match(i, matchers) and block.call(i)
@@ -131,7 +131,7 @@ module PlainRecord
 
     # Return glob pattern to for files with entris, which is may be match for
     # +matchers+.
-    def path(matchers = {})
+    def path(matchers = { })
       use_callbacks(:path, matchers) do
         @path
       end
@@ -180,7 +180,7 @@ module PlainRecord
     #
     # Also add methods from <tt>Model::Entry</tt>.
     #
-    #   entry_in 'content/*/post.m'
+    #   entry_in 'content/*/post.md'
     def entry_in(path)
       @storage = :entry
       @path = path
@@ -211,7 +211,7 @@ module PlainRecord
     #   class Post
     #     include PlainRecord::Resource
     #
-    #     entry_in 'posts/*/post.m'
+    #     entry_in 'posts/*/post.md'
     #
     #     virtual :name, in_filepath(1)
     #   end
@@ -237,7 +237,7 @@ module PlainRecord
     #   class Post
     #     include PlainRecord::Resource
     #
-    #     entry_in 'posts/*/post.m'
+    #     entry_in 'posts/*/post.md'
     #
     #     property :title
     #   end
@@ -281,7 +281,7 @@ module PlainRecord
     #   class Post
     #     include PlainRecord::Resource
     #
-    #     entry_in 'posts/*/post.m'
+    #     entry_in 'posts/*/post.md'
     #
     #     property :title
     #     text :summary
