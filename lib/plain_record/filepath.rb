@@ -28,31 +28,31 @@ module PlainRecord
   #    +list_in+.
   # 2. In +virtual+ method use <tt>in_filepath(i)</tt> definer after name with
   #    <tt>*</tt> or <tt>**</tt> number (start from 1).
-  # 
+  #
   # Define filepath property only after +entry_in+ or +list_in+ call.
-  # 
+  #
   #   class Post
   #     include PlainRecord::Resource
-  #     
+  #
   #     entry_in '*/*/post.m'
-  #     
+  #
   #     virtual :category, in_filepath(1)
   #     virtual :name,     in_filepath(1)
   #     …
   #   end
-  #   
+  #
   #   superpost = Post.new
   #   superpost.name = 'superpost'
   #   superpost.category = 'best/'
   #   superpost.save                     # Save to best/superpost/post.m
-  #   
+  #
   #   bests = Post.all(category: 'best') # Look up only in best/ dir
   module Filepath
     attr_accessor :filepath_properties
     attr_accessor :filepath_regexp
-    
+
     private
-    
+
     # Return definer for filepath property for +number+ <tt>*</tt> or
     # <tt>**</tt> pattern in path.
     def in_filepath(number)
@@ -65,21 +65,21 @@ module PlainRecord
         nil
       end
     end
-    
+
     class << self
       # Define class variables and events in +klass+. It should be call once on
       # same class after +entry_in+ or +list_in+ call.
       def install(klass)
         klass.filepath_properties = {}
-        
+
         path = Regexp.escape(klass.path).gsub(/\\\*\\\*(\/|$)/, '(.*)').
                                           gsub('\\*', '([^/]+)')
         klass.filepath_regexp = Regexp.new(path)
-          
+
         klass.class_eval do
           attr_accessor :filepath_data
         end
-        
+
         klass.after :load do |result, entry|
           if entry.path
             data = klass.filepath_regexp.match(entry.path)
@@ -96,7 +96,7 @@ module PlainRecord
           end
           result
         end
-        
+
         klass.after :path do |path, matchers|
           i = 0
           path.gsub /(\*\*(\/|$)|\*)/ do |pattern|
@@ -109,7 +109,7 @@ module PlainRecord
             end
           end
         end
-        
+
         klass.before :save do |entry|
           unless entry.file
             path = klass.path(entry.filepath_data)
@@ -117,16 +117,16 @@ module PlainRecord
           end
         end
       end
-      
+
       # Define in +klass+ filepath property with +name+ for +number+ <tt>*</tt>
       # or <tt>**</tt> pattern in path.
       def define_property(klass, name, number)
         unless klass.filepath_properties
           install(klass)
         end
-        
+
         klass.filepath_properties[number] = name
-        
+
         klass.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             @filepath_data[:#{name}]

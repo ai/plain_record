@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 require 'pathname'
 require 'yaml'
 
+YAML::ENGINE.yamler = 'syck'
+
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'version'
 require dir + 'callbacks'
@@ -39,7 +41,7 @@ module PlainRecord
       value += File::SEPARATOR if File::SEPARATOR != value[-1..-1]
       @root = value
     end
-    
+
     # Return root for Model#entry_in or Model#list_in.
     # 
     # If you set +path+ it will be added to root path.

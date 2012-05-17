@@ -30,17 +30,17 @@ module PlainRecord
         end
         @loaded[file]
       end
-      
+
       def each_entry(matcher = {})
         files(matcher).each do |file|
           yield load_file(file)
         end
       end
-      
+
       def delete_entry(file, entry = nil)
         delete_file(file)
       end
-      
+
       def move_entry(entry, from, to)
         if from
           @loaded.delete(from)
@@ -48,13 +48,13 @@ module PlainRecord
         end
         @loaded[to] = entry
       end
-      
+
       private
-      
+
       def all_entries(matcher = {})
         files(matcher).map { |file| load_file(file) }
       end
-      
+
       def entries_string(entry)
         entry.to_yaml + entry.texts.map{ |i| "---\n" + i }.join("\n")
       end

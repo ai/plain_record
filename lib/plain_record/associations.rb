@@ -36,34 +36,34 @@ module PlainRecord
   # name like +property+ → <tt>model</tt>_<tt>property</tt>. For example,
   # if model +Post+ have property +name+ and +Comment+ have +post_name+, you
   # may not set +map+ – definer will find it automatically.
-  # 
+  #
   #   class Review
   #     include PlainRecord::Resource
-  #     
+  #
   #     entry_in 'reviews/*.m'
-  #     
+  #
   #     virtual  :author, one(Author)
   #     property :author_login
   #     text     :review
   #   end
-  #   
+  #
   #   class Author
   #     include PlainRecord::Resource
-  #     
+  #
   #     list_in 'authors.yml'
-  #     
+  #
   #     virtual  :reviews, many(Review)
   #     property :login
   #     property :name
   #   end
-  # 
+  #
   # == Real property
   # If you will use this definer in +property+ method, association object data
   # will store in you model file. For example model:
-  # 
+  #
   #   class Movie
   #     include PlainRecord::Resource
-  #     
+  #
   #     property :title
   #     property :genre
   #     property :release_year
@@ -73,12 +73,12 @@ module PlainRecord
   #     include PlainRecord::Resource
   #     property :name
   #   end
-  #  
+  #
   #   class Review
   #     include PlainRecord::Resource
-  #     
+  #
   #     entry_in 'reviews/*.m'
-  #     
+  #
   #     property :author
   #     property :movie, one(Movie)
   #     property :tags, many(Tag)
@@ -86,7 +86,7 @@ module PlainRecord
   #   end
   #
   # will be store as:
-  # 
+  #
   #   author: John Smith 
   #   movie:
   #     title: Watchmen
@@ -100,12 +100,12 @@ module PlainRecord
   module Associations
     # Hash with map for virtual associations.
     attr_accessor :association_maps
-    
+
     # Hash with cached values for virtual associations.
     attr_accessor :association_cache
-    
+
     private
-    
+
     # Return definer for one-to-one association with +klass+. Have different
     # logic in +property+ and +virtual+ methods.
     def one(klass, map = {})
@@ -123,7 +123,7 @@ module PlainRecord
         end
       end
     end
-    
+
     # Return definer for one-to-many or many-to-many association with +klass+.
     # Have different login in +property+ and +virtual+ methods.
     def many(klass, prefix = nil, map = {})
@@ -144,7 +144,7 @@ module PlainRecord
         end
       end
     end
-    
+
     class << self
       # Define, that +property+ in +klass+ contain in file data from +model+.
       def define_real_one(klass, property, model)
@@ -163,7 +163,7 @@ module PlainRecord
           result
         end
       end
-      
+
       # Define, that +property+ in +klass+ contain in file array of data from
       # +model+ objects.
       def define_real_many(klass, property, model)
@@ -194,13 +194,13 @@ module PlainRecord
           result
         end
       end
-      
+
       # Find properties pairs in +from+ and +to+ models, witch is like
       # <tt>prefix</tt>_<tt>from</tt> → +to+.
-      # 
+      #
       # For example, if Comment contain +post_name+ property and Post contain
       # +name+:
-      # 
+      #
       #   Associations.map(Comment, Post, :post) #=> { :post_name => :name }
       def map(from, to, prefix)
         from_fields = (from.properties + from.virtuals).map { |i| i.to_s }
@@ -213,14 +213,14 @@ module PlainRecord
         end
         mapped
       end
-      
+
       # Define that virtual property +name+ in +klass+ contain link to +model+
       # witch is finded by +map+.
       def define_link_one(klass, model, name, map)
         klass.association_cache ||= {}
         klass.association_maps ||= {}
         klass.association_maps[name] = map
-        
+
         klass.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             unless self.class.association_cache[:#{name}]
@@ -240,14 +240,14 @@ module PlainRecord
           end
         EOS
       end
-      
+
       # Define that virtual property +name+ in +klass+ contain links to +model+
       # witch are finded by +map+.
       def define_link_many(klass, model, name, map)
         klass.association_cache ||= {}
         klass.association_maps ||= {}
         klass.association_maps[name] = map
-        
+
         klass.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             unless self.class.association_cache[:#{name}]

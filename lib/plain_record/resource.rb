@@ -34,13 +34,13 @@ module PlainRecord
   #
   #   class Post
   #     include PlainRecord::Resource
-  #     
+  #
   #     entry_in 'content/*/post.m'
-  #     
+  #
   #     before :save do |enrty|
   #       entry.title = Time.now.to.s unless entry.title
   #     end
-  #     
+  #
   #     virtual :name, in_filepath(1)
   #     property :title
   #     text :summary
@@ -52,47 +52,47 @@ module PlainRecord
         base.send :extend, Model
       end
     end
-    
+
     # Properties values.
     attr_reader :data
-    
+
     # Texts values.
     attr_reader :texts
-    
+
     # File, where this object is stored.
     attr_accessor :file
-    
+
     # Create new model instance with YAML +data+ and +texts+ from +file+.
     def initialize(file = nil, data = {}, texts = [])
       self.class.use_callbacks(:load, self) do
         texts, data = data, nil if data.is_a? Array
-        data, file = file, nil if file.is_a? Hash
-        
-        @file = file
-        @data = data
+        data,  file = file, nil if file.is_a? Hash
+
+        @file  = file
+        @data  = data
         @texts = texts
       end
     end
-    
+
     # Set path to entry storage. File should be in <tt>PlainRecord.root</tt> and
     # can be relative.
     def file=(value)
       if PlainRecord.root != value.slice(0...PlainRecord.root.length)
         value = PlainRecord.root(value)
       end
-      
+
       if @file != value
         self.class.move_entry(self, @file, value)
         @file = value
       end
     end
-    
+
     # Return relative path to +file+ from <tt>PlainRecord.root</tt>.
     def path
       return nil unless @file
       @file.slice(PlainRecord.root.length..-1)
     end
-    
+
     # Save entry to file. Note, that for in_list models it also save all other
     # entries in file.
     def save
@@ -105,23 +105,23 @@ module PlainRecord
                                  "Set filepath properties or file."
           end
         end
-        
+
         self.class.save_file(@file)
       end
     end
-    
+
     # Delete current entry and it file if there isn’t has any other entries.
     def destroy
       self.class.use_callbacks(:destroy, self) do
         self.class.delete_entry(@file, self)
       end
     end
-    
+
     # Return string of YAML representation of entry +data+.
     def to_yaml(opts = {})
       @data.to_yaml(opts)
     end
-    
+
     # Compare if its properties and texts are equal.
     def eql?(other)
       return false unless other.kind_of?(self.class)

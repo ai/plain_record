@@ -26,55 +26,55 @@ module PlainRecord
     dir = Pathname(__FILE__).dirname.expand_path + 'model'
     autoload :Entry, (dir + 'entry').to_s
     autoload :List,  (dir + 'list').to_s
-    
+
     include PlainRecord::Callbacks
     include PlainRecord::Filepath
     include PlainRecord::Associations
-    
+
     # YAML properties names.
     attr_accessor :properties
-    
+
     # Name of special properties with big text.
     attr_accessor :texts
-    
+
     # Properties names with dynamic value.
     attr_accessor :virtuals
-    
+
     # Storage type: +:entry+ or +:list+.
     attr_reader :storage
-    
+
     # Content of already loaded files.
     attr_accessor :loaded
-    
+
     def self.extended(base) #:nodoc:
       base.properties = []
       base.virtuals = []
       base.texts = []
       base.loaded = {}
     end
-    
+
     # Load and return all entries in +file+.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def load_file(file); end
-    
+
     # Call block on all entry, which is may be match for +matchers+. Unlike
     # <tt>all.each</tt> it use lazy file loading, so it is useful if you planing
     # to break this loop somewhere in the middle (for example, like +first+).
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def each_entry(matchers = {}); end
-    
+
     # Delete +entry+ from +file+.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def delete_entry(file, entry = nil); end
-    
+
     # Move +entry+ from one file to another.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def move_entry(entry, from, to); end
-      
+
     # Write all loaded entries to +file+.
     def save_file(file)
       if @loaded.has_key? file
@@ -83,7 +83,7 @@ module PlainRecord
         end
       end
     end
-    
+
     # Return all entries, which is match for +matchers+ and return true on
     # +block+.
     #
@@ -99,7 +99,7 @@ module PlainRecord
       entries.delete_if { |i| not block.call(i) } if block_given?
       entries
     end
-    
+
     # Return first entry, which is match for +matchers+ and return true on
     # +block+.
     #
@@ -121,12 +121,12 @@ module PlainRecord
       end
       nil
     end
-    
+
     # Return all file list for models, which match for +matchers+.
     def files(matchers = {})
       Dir.glob(PlainRecord.root(path(matchers)))
     end
-    
+
     # Return glob pattern to for files with entris, which is may be match for
     # +matchers+.
     def path(matchers = {})
@@ -134,24 +134,24 @@ module PlainRecord
         @path
       end
     end
-    
+
     private
-    
+
     # Return all model entries, which is may be match for +matchers+.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def all_entries(matchers); end
-    
+
     # Return string representation of +entries+ to write it to file.
     #
     # See method code in <tt>Model::Entry</tt> or <tt>Model::List</tt>.
     def entries_string(entries); end
-    
+
     # Delete file, cache and empty dirs in path.
     def delete_file(file)
       File.delete(file)
       @loaded.delete(file)
-      
+
       path = Pathname(file).dirname
       root = Pathname(PlainRecord.root)
       until 2 != path.entries.length or path == root
@@ -159,7 +159,7 @@ module PlainRecord
         path = path.parent
       end
     end
-    
+
     # Match +object+ by +matchers+ to use in +all+ and +first+ methods.
     def match(object, matchers)
       matchers.each_pair do |key, matcher|
@@ -172,7 +172,7 @@ module PlainRecord
       end
       true
     end
-    
+
     # Set glob +pattern+ for files with entry. Each file must contain one entry.
     # To set root for this path use +PlainRecord.root+.
     #
@@ -184,7 +184,7 @@ module PlainRecord
       @path = path
       self.extend PlainRecord::Model::Entry
     end
-    
+
     # Set glob +pattern+ for files with list of entries. Each file may contain
     # several entries, but you may have several files. All data will storage
     # in YAML, so you can’t define +text+.
@@ -197,7 +197,7 @@ module PlainRecord
       @path = path
       self.extend PlainRecord::Model::List
     end
-    
+
     # Add virtual property with some +name+ to model. It value willn’t be in
     # file and will be calculated dynamically.
     #
@@ -205,7 +205,7 @@ module PlainRecord
     # will be call with property name in first argument and may return
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
     # to access to property.
-    # 
+    #
     #   class Post
     #     include PlainRecord::Resource
     #
@@ -216,22 +216,22 @@ module PlainRecord
     def virtual(name, *definers)
       @virtuals ||= []
       @virtuals << name
-      
+
       accessors = call_definers(definers, name, :virtual)
-      
+
       if accessors[:reader] or accessors[:writer]
         raise ArgumentError, 'You must provide you own accessors for virtual ' +
                              "property #{name}"
       end
     end
-    
+
     # Add property with some +name+ to model. It will be stored as YAML.
     #
     # You can provide your own define logic by +definers+. Definer Proc
     # will be call with property name in first argument and may return
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
     # to access to property.
-    # 
+    #
     #   class Post
     #     include PlainRecord::Resource
     #
@@ -242,9 +242,9 @@ module PlainRecord
     def property(name, *definers)
       @properties ||= []
       @properties << name
-      
+
       accessors = call_definers(definers, name, :property)
-      
+
       if accessors[:reader]
         class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
@@ -260,7 +260,7 @@ module PlainRecord
         EOS
       end
     end
-    
+
     # Add special property with big text (for example, blog entry content). It
     # will stored after 3 dashes (<tt>---</tt>).
     #
@@ -275,7 +275,7 @@ module PlainRecord
     # == Example
     #
     # Model:
-    # 
+    #
     #   class Post
     #     include PlainRecord::Resource
     #
@@ -285,9 +285,9 @@ module PlainRecord
     #     text :summary
     #     text :content
     #   end
-    # 
+    #
     # File:
-    # 
+    #
     #   title: Post title
     #   ---
     #   Post summary
@@ -297,13 +297,13 @@ module PlainRecord
       if :list == @storage
         raise ArgumentError, 'Text is supported by only entry_in models'
       end
-      
+
       @texts ||= []
       @texts << name
       number = @texts.length - 1
-      
+
       accessors = call_definers(definers, name, :text)
-      
+
       if accessors[:reader]
         class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
@@ -319,13 +319,13 @@ module PlainRecord
         EOS
       end
     end
-    
+
     # Call +definers+ from +caller+ (<tt>:virtual</tt>, <tt>:property</tt> or
     # <tt>:text</tt>) for property with +name+ and return accessors, which will
     # be created as standart by +property+ or +text+ method.
     def call_definers(definers, name, caller)
       accessors = {:reader => true, :writer => true}
-      
+
       definers.each do |definer|
         access = definer.call(name, caller)
         if :writer == access or access.nil?
@@ -335,7 +335,7 @@ module PlainRecord
           accessors[:writer] = false
         end
       end
-      
+
       accessors
     end
   end

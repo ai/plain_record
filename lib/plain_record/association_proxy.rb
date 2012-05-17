@@ -23,10 +23,10 @@ module PlainRecord
   class AssociationProxy < Array
     # Model with association.
     attr_accessor :owner
-    
+
     # Associations property name.
     attr_accessor :property
-    
+
     # Create proxy for one-to-many virtual associations +property+ in +owner+
     # and put +array+ into it.
     def self.link(array, owner, property)
@@ -34,7 +34,7 @@ module PlainRecord
       proxy.each { |i| proxy.link(i) }
       proxy
     end
-    
+
     # Create proxy for one-to-many virtual associations +property+ in +owner+
     # with +array+ in value.
     def initialize(array, owner, property)
@@ -42,13 +42,13 @@ module PlainRecord
       @property = property
       super(array)
     end
-    
+
     # Push new item in association and change it property by association map.
     def <<(obj)
       link(obj)
       super(obj)
     end
-    
+
     # Change properties in +obj+ by association map.
     def link(obj)
       @owner.class.association_maps[@property].each do |from, to|

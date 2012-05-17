@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), '../lib/plain_record')
 
 class Post
   include PlainRecord::Resource
-  
+
   entry_in 'data/*/post.m'
-  
+
   property :title
   text :summary
   text :content
@@ -13,20 +13,21 @@ end
 
 class FilepathPost
   include PlainRecord::Resource
-  
+
   entry_in 'data/**/*/post.m'
-  
+
   virtual :category, in_filepath(1)
   virtual :name,     in_filepath(2)
-  
+
   property :title
 end
 
 class Author
   include PlainRecord::Resource
-  
+
   list_in 'data/authors/*.yml'
-  
+
+  virtual  :type, in_filepath(1)
   property :login
   property :name
 end

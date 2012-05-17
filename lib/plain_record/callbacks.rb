@@ -23,16 +23,16 @@ module PlainRecord
   module Callbacks
     # Hash of class callbacks with property.
     attr_accessor :callbacks
-    
+
     # Set block as callback before +events+. Callback with less +priority+ will
     # start earlier.
     #
     #   class File
     #     include PlainRecord::Callbacks
-    #     
+    #
     #     attr_accessor :name
     #     attr_accessor :content
-    #     
+    #
     #     def save
     #       use_callbacks(:save, self) do
     #         File.open(@name, 'w') { |io| io.puts @content }
@@ -46,7 +46,7 @@ module PlainRecord
     #         file.name = 'another ' + file.name
     #       end
     #     end
-    #     
+    #
     #     before, :save do
     #       raise ArgumentError if 255 < @name.length
     #     end
@@ -56,7 +56,7 @@ module PlainRecord
         add_callback(:before, event, priority, block)
       end
     end
-    
+
     # Set block as callback after +events+. Callback with less +priority+ will
     # start earlier.
     #
@@ -66,7 +66,7 @@ module PlainRecord
     #
     #   class Person
     #     include PlainRecord::Callbacks
-    #     
+    #
     #     def name
     #       use_callbacks(:name) do
     #         'John'
@@ -78,7 +78,7 @@ module PlainRecord
     #     after :name, 2 do |name|
     #       'Great ' + name
     #     end
-    #     
+    #
     #     after :name do |name|
     #       'The ' + name
     #     end
@@ -90,7 +90,7 @@ module PlainRecord
         add_callback(:after, event, priority, block)
       end
     end
-    
+
     # Call +before+ callbacks for +event+ with +params+. In your
     # code use more pretty +use_callbacks+ method.
     def call_before_callbacks(event, params)
@@ -99,7 +99,7 @@ module PlainRecord
         before.call(*params)
       end
     end
-    
+
     # Call +before+ callbacks for +event+ with +params+. Callbacks can change 
     # +result+. In your code use more pretty +use_callbacks+ method.
     def call_after_callbacks(event, result, params)
@@ -109,7 +109,7 @@ module PlainRecord
       end
       result
     end
-    
+
     # Call before callback for +event+, run block and give it result to
     # after callbacks.
     #
@@ -123,21 +123,21 @@ module PlainRecord
       result = yield
       call_after_callbacks(event, result, params)
     end
-    
+
     private
-    
+
     # Backend for +before+ and +after+ method to add callback.
     def add_callback(type, event, priority, block)
       init_callbacks(event)
-      
+
       @callbacks[type][event] << [block, priority]
       @callbacks[type][event].sort! { |a, b| a[1] <=> b[1] }
     end
-    
+
     # Check and create Hash into +callbacks+ for +event+ if necessary.
     def init_callbacks(event)
       unless @callbacks
-        @callbacks = {:before => {}, :after => {}}
+        @callbacks = { :before => { }, :after => { } }
       end
       @callbacks[:before][event] = [] unless @callbacks[:before][event]
       @callbacks[:after][event] = [] unless @callbacks[:after][event]

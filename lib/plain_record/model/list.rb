@@ -29,7 +29,7 @@ module PlainRecord
         end
         @loaded[file]
       end
-      
+
       def each_entry(matcher = {})
         files(matcher).each do |file|
           load_file(file).each do |entry|
@@ -37,7 +37,7 @@ module PlainRecord
           end
         end
       end
-      
+
       def delete_entry(file, entry = nil)
         if entry.nil? or 1 == @loaded[file].length
           delete_file(file)
@@ -46,7 +46,7 @@ module PlainRecord
           save_file(file)
         end
       end
-      
+
       def move_entry(entry, from, to)
         if from
           @loaded[from].delete(entry)
@@ -59,13 +59,13 @@ module PlainRecord
         @loaded[to] = [] unless @loaded.has_key? to
         @loaded[to] << entry
       end
-      
+
       private
-      
+
       def all_entries(matcher = {})
         files(matcher).map { |file| load_file(file) }.flatten
       end
-      
+
       def entries_string(entries)
         entries.to_yaml
       end
