@@ -48,9 +48,9 @@ module PlainRecord
 
     def self.extended(base) #:nodoc:
       base.properties = []
-      base.virtuals = []
-      base.texts = []
-      base.loaded = {}
+      base.virtuals   = []
+      base.texts      = []
+      base.loaded     = { }
     end
 
     # Load and return all entries in +file+.
@@ -96,7 +96,7 @@ module PlainRecord
     def all(matchers = {}, &block)
       entries = all_entries(matchers)
       entries.delete_if { |i| not match(i, matchers) } if matchers
-      entries.delete_if { |i| not block.call(i) } if block_given?
+      entries.delete_if { |i| not block.call(i) }      if block_given?
       entries
     end
 
@@ -111,7 +111,9 @@ module PlainRecord
     #   Post.first { |post| 2 < Post.title.length }
     def first(matchers = {}, &block)
       if matchers and block_given?
-        each_entry(matchers) { |i| return i if match(i, matchers) and block.call(i) }
+        each_entry(matchers) do |i|
+          return i if match(i, matchers) and block.call(i)
+        end
       elsif matchers
         each_entry(matchers) { |i| return i if match(i, matchers) }
       elsif block_given?
@@ -123,7 +125,7 @@ module PlainRecord
     end
 
     # Return all file list for models, which match for +matchers+.
-    def files(matchers = {})
+    def files(matchers = { })
       Dir.glob(PlainRecord.root(path(matchers)))
     end
 
@@ -324,7 +326,7 @@ module PlainRecord
     # <tt>:text</tt>) for property with +name+ and return accessors, which will
     # be created as standart by +property+ or +text+ method.
     def call_definers(definers, name, caller)
-      accessors = {:reader => true, :writer => true}
+      accessors = { :reader => true, :writer => true }
 
       definers.each do |definer|
         access = definer.call(name, caller)

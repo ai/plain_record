@@ -95,8 +95,8 @@ describe PlainRecord::Resource do
     end
 
     callbacks  = mock()
-    callbacks.should_receive(:path).with(Callbacked.path, {:title => 'First'}).
-                                    and_return('data/1/post.m')
+    callbacks.should_receive(:path).
+      with(Callbacked.path, { :title => 'First' }).and_return('data/1/post.m')
     callbacks.should_receive(:load).with(an_instance_of Callbacked)
     callbacks.should_receive(:save).with(an_instance_of Callbacked).and_raise
     callbacks.should_receive(:destroy).with(an_instance_of Callbacked).and_raise

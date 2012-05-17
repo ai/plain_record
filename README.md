@@ -31,12 +31,12 @@ For example we will create simple blog storage with posts and comments.
 
       entry_in '*/post.m'
 
-      virtual :name, in_filepath(1)
-      virtual :comments, many(Comment)
+      virtual  :name,     in_filepath(1)
+      virtual  :comments, many(Comment)
       property :title
       property :tags
-      text :summary
-      text :content
+      text     :summary
+      text     :content
     end
      ```
 
@@ -61,8 +61,8 @@ For example we will create simple blog storage with posts and comments.
 
       list_in '*/comments.yml'
 
-      virtual :post_name, in_filepath(1)
-      virtual :post, one(Post)
+      virtual  :post_name, in_filepath(1)
+      virtual  :post,      one(Post)
       property :author
       property :comment
     end

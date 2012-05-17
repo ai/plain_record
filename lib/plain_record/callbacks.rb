@@ -140,7 +140,7 @@ module PlainRecord
         @callbacks = { :before => { }, :after => { } }
       end
       @callbacks[:before][event] = [] unless @callbacks[:before][event]
-      @callbacks[:after][event] = [] unless @callbacks[:after][event]
+      @callbacks[:after][event]  = [] unless @callbacks[:after][event]
     end
   end
 end

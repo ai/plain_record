@@ -29,7 +29,7 @@ module PlainRecord
   # Rules in +map+ is only Hash with model properties in key and association
   # properties in value. For example, if model contain +name+ property and
   # association must have +post_name+ with same value, +map+ will be 
-  # <tt>{:name => :post_name}</tt>.
+  # <tt>{ :name => :post_name }</tt>.
   #
   # If you didn’t set +map+ definer will try to find it automatically:
   # it will find in model and association class all property pairs, what have

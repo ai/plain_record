@@ -43,7 +43,7 @@ module PlainRecord
     end
 
     # Return root for Model#entry_in or Model#list_in.
-    # 
+    #
     # If you set +path+ it will be added to root path.
     def root(path = '')
       File.join(@root, path)
