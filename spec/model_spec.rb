@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe PlainRecord::Model do
 
   after :each do
-    Post.loaded = {}
+    Post.loaded   = {}
     Author.loaded = {}
   end
 
@@ -78,9 +78,9 @@ describe PlainRecord::Model do
     definer.stub!(:text).with(:three, :text)
     klass = Class.new do
       include PlainRecord::Resource
-      virtual :one, definer.method(:virtual)
-      property :two, definer.method(:property)
-      text :three, definer.method(:text)
+      virtual  :one,   definer.method(:virtual)
+      property :two,   definer.method(:property)
+      text     :three, definer.method(:text)
     end
   end
 

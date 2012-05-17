@@ -10,7 +10,6 @@ class Post
   text :content
 end
 
-
 class FilepathPost
   include PlainRecord::Resource
 

@@ -3,16 +3,16 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe PlainRecord::Resource do
 
   after :each do
-    Post.loaded = {}
+    Post.loaded   = {}
     Author.loaded = {}
   end
 
   it "should compare two object" do
-    first = Post.load_file(FIRST)
-    another_first = Post.load_file(FIRST)
-    second = Post.load_file(SECOND)
+    first   = Post.load_file(FIRST)
+    another = Post.load_file(FIRST)
+    second  = Post.load_file(SECOND)
 
-    first.should == another_first
+    first.should == another
     first.should_not == second
   end
 
@@ -86,8 +86,15 @@ describe PlainRecord::Resource do
   end
 
   it "should call callbacks" do
-    Callbacked = Post.dup
-    callbacks = mock()
+    class Callbacked
+      include PlainRecord::Resource
+      entry_in 'data/*/post.m'
+      property :title
+      text :summary
+      text :content
+    end
+
+    callbacks  = mock()
     callbacks.should_receive(:path).with(Callbacked.path, {:title => 'First'}).
                                     and_return('data/1/post.m')
     callbacks.should_receive(:load).with(an_instance_of Callbacked)
@@ -99,7 +106,7 @@ describe PlainRecord::Resource do
     Callbacked.before :save,    &callbacks.method(:save)
     Callbacked.before :destroy, &callbacks.method(:destroy)
 
-    first = Callbacked.first({:title => 'First'})
+    first = Callbacked.first({ :title => 'First' })
     lambda { first.save }.should raise_error
     lambda { first.destroy }.should raise_error
   end
