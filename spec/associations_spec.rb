@@ -64,10 +64,9 @@ describe PlainRecord::Associations do
     ::RatedPost.first().save()
 
     file.rewind
-    file.read.should == "title: Third\n" +
-                        "rate: \n" +
-                        "  text: 2\n" +
-                        "  subject: 5\n"
+    YAML.load(file.read).should == {
+      'title' => 'Third', 'rate'  => { 'text' => 2, 'subject' => 5 }
+    }
   end
 
   it "should load one-to-many real association" do
@@ -86,11 +85,13 @@ describe PlainRecord::Associations do
     ::Comment.first().save()
 
     file.rewind
-    file.read.should == "- author_name: super1997\n" +
-                        "  text: Cool!\n" +
-                        "  answers: \n" +
-                        "  - author_name: john\n" +
-                        "    text: Thanks\n"
+    YAML.load(file.read).should == [
+      {
+        'author_name' => 'super1997',
+        'text'        => 'Cool!',
+        'answers'     => [{ 'author_name' => 'john', 'text' => 'Thanks' }]
+      }
+    ]
   end
 
   it "should find map for virtual association" do
