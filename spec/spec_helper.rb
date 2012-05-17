@@ -49,7 +49,7 @@ def model_methods(model)
         PlainRecord::Resource.instance_methods).map { |i| i.to_s }
 end
 
-Spec::Matchers.define :has_methods do |*methods|
+RSpec::Matchers.define :has_methods do |*methods|
   match do |model|
     model_methods(model).sort == methods.map! { |i| i.to_s }.sort
   end
