@@ -54,6 +54,13 @@ RSpec::Matchers.define :has_methods do |*methods|
   end
 end
 
+RSpec::Matchers.define :has_yaml do |data|
+  match do |file|
+    file.rewind
+    YAML.load(file.read).should == data
+  end
+end
+
 class Definers
   def self.accessor
     proc { :accessor }
