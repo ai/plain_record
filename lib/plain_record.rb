@@ -38,8 +38,9 @@ module PlainRecord
     # Note, that it add last slash to root path (<tt>/content</tt> will be saved
     # as <tt>/content/</tt>).
     def root=(value)
+      value  = value.to_s
       value += File::SEPARATOR if File::SEPARATOR != value[-1..-1]
-      @root = value
+      @root  = value
     end
 
     # Return root for Model#entry_in or Model#list_in.
