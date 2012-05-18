@@ -1,5 +1,5 @@
 =begin
-Extention to get property from entry file path.
+Extention to get field from entry file path.
 
 Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>,
 sponsored by Evil Martians.
@@ -19,18 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
 module PlainRecord
-  # Extention to get properties from enrty file path. For example, your blog
+  # Extention to get fields from enrty file path. For example, your blog
   # post may stored in <tt>_name_/post.md</tt>, and post model will have +name+
-  # property. Also if you set name property to Model#first or Model#all method,
+  # field. Also if you set name field to Model#first or Model#all method,
   # they will load entry directly only by it file.
   #
-  # To define filepath property:
+  # To define filepath field:
   # 1. Use <tt>*</tt> or <tt>**</tt> pattern in model path in +enrty_in+ or
   #    +list_in+.
   # 2. In +virtual+ method use <tt>in_filepath(i)</tt> definer after name with
   #    <tt>*</tt> or <tt>**</tt> number (start from 1).
   #
-  # Define filepath property only after +entry_in+ or +list_in+ call.
+  # Define filepath field only after +entry_in+ or +list_in+ call.
   #
   #   class Post
   #     include PlainRecord::Resource
@@ -49,20 +49,20 @@ module PlainRecord
   #
   #   bests = Post.all(category: 'best') # Look up only in best/ dir
   module Filepath
-    attr_accessor :filepath_properties
+    attr_accessor :filepath_fields
     attr_accessor :filepath_regexp
 
     private
 
-    # Return definer for filepath property for +number+ <tt>*</tt> or
+    # Return definer for filepath field for +number+ <tt>*</tt> or
     # <tt>**</tt> pattern in path.
     def in_filepath(number)
-      proc do |property, caller|
+      proc do |field, caller|
         if :virtual != caller
-          raise ArgumentError, "You must create filepath property #{property}" +
+          raise ArgumentError, "You must create filepath field #{field}" +
                                ' virtual creator'
         end
-        Filepath.define_property(self, property, number)
+        Filepath.define_field(self, field, number)
         nil
       end
     end
@@ -71,7 +71,7 @@ module PlainRecord
       # Define class variables and events in +klass+. It should be call once on
       # same class after +entry_in+ or +list_in+ call.
       def install(klass)
-        klass.filepath_properties = { }
+        klass.filepath_fields = { }
 
         path = Regexp.escape(klass.path).gsub(/\\\*\\\*(\/|$)/, '(.*)').
                                          gsub('\\*', '([^/]+)')
@@ -85,12 +85,12 @@ module PlainRecord
           if entry.path
             data = klass.filepath_regexp.match(entry.path)
             entry.filepath_data = { }
-            klass.filepath_properties.each_pair do |number, name|
+            klass.filepath_fields.each_pair do |number, name|
               entry.filepath_data[name] = data[number]
             end
           else
             entry.filepath_data = { }
-            klass.filepath_properties.each_value do |name|
+            klass.filepath_fields.each_value do |name|
               entry.filepath_data[name] = entry.data[name]
               entry.data.delete(name)
             end
@@ -102,9 +102,9 @@ module PlainRecord
           i = 0
           path.gsub /(\*\*(\/|$)|\*)/ do |pattern|
             i += 1
-            property = klass.filepath_properties[i]
-            unless matchers[property].is_a? Regexp or matchers[property].nil?
-              matchers[property]
+            field = klass.filepath_fields[i]
+            unless matchers[field].is_a? Regexp or matchers[field].nil?
+              matchers[field]
             else
               pattern
             end
@@ -119,14 +119,14 @@ module PlainRecord
         end
       end
 
-      # Define in +klass+ filepath property with +name+ for +number+ <tt>*</tt>
+      # Define in +klass+ filepath field with +name+ for +number+ <tt>*</tt>
       # or <tt>**</tt> pattern in path.
-      def define_property(klass, name, number)
-        unless klass.filepath_properties
+      def define_field(klass, name, number)
+        unless klass.filepath_fields
           install(klass)
         end
 
-        klass.filepath_properties[number] = name
+        klass.filepath_fields[number] = name
 
         klass.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}

@@ -27,7 +27,7 @@ For example we will create simple blog storage with posts and comments.
      ```
 
 3. Create Post class, include `Plain::Resource` module, set glob pattern
-   to posts files and define properties:
+   to posts files and define fields:
 
      ```ruby
     class Post
@@ -35,16 +35,16 @@ For example we will create simple blog storage with posts and comments.
 
       entry_in '*/post.md'
 
-      virtual  :name,     in_filepath(1)
-      virtual  :comments, many(Comment)
-      property :title
-      property :tags
-      text     :summary
-      text     :content
+      virtual :name,     in_filepath(1)
+      virtual :comments, many(Comment)
+      field   :title
+      field   :tags
+      text    :summary
+      text    :content
     end
      ```
 
-4. Create new post file `data/first/post.md`. Properties will be saved as
+4. Create new post file `data/first/post.md`. Fields will be saved as
    YAML and text will be placed as plain text, which is separated by 3 dashes:
 
      ```
@@ -65,10 +65,10 @@ For example we will create simple blog storage with posts and comments.
 
       list_in '*/comments.yml'
 
-      virtual  :post_name, in_filepath(1)
-      virtual  :post,      one(Post)
-      property :author
-      property :comment
+      virtual :post_name, in_filepath(1)
+      virtual :post,      one(Post)
+      field   :author
+      field   :comment
     end
      ```
    You can’t use text fields in list files.
@@ -94,7 +94,7 @@ For example we will create simple blog storage with posts and comments.
      ```
 
 9. To get one entry use `first` method, which also can take matchers. You can
-   access for properties and text by methods with same name:
+   access for fields and text by methods with same name:
 
      ```ruby
     post = Post.first(title: /first/)

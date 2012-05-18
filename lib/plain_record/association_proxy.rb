@@ -20,39 +20,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module PlainRecord
   # Storage for one-to-many virtual associations. When new object will pushed,
-  # proxy change it mapped properties.
+  # proxy change it mapped fields.
   class AssociationProxy < Array
     # Model with association.
     attr_accessor :owner
 
-    # Associations property name.
-    attr_accessor :property
+    # Associations field name.
+    attr_accessor :field
 
-    # Create proxy for one-to-many virtual associations +property+ in +owner+
+    # Create proxy for one-to-many virtual associations +field+ in +owner+
     # and put +array+ into it.
-    def self.link(array, owner, property)
-      proxy = new(array, owner, property)
+    def self.link(array, owner, field)
+      proxy = new(array, owner, field)
       proxy.each { |i| proxy.link(i) }
       proxy
     end
 
-    # Create proxy for one-to-many virtual associations +property+ in +owner+
+    # Create proxy for one-to-many virtual associations +field+ in +owner+
     # with +array+ in value.
-    def initialize(array, owner, property)
+    def initialize(array, owner, field)
       @owner = owner
-      @property = property
+      @field = field
       super(array)
     end
 
-    # Push new item in association and change it property by association map.
+    # Push new item in association and change it field by association map.
     def <<(obj)
       link(obj)
       super(obj)
     end
 
-    # Change properties in +obj+ by association map.
+    # Change fields in +obj+ by association map.
     def link(obj)
-      @owner.class.association_maps[@property].each do |from, to|
+      @owner.class.association_maps[@field].each do |from, to|
         obj.send(from.to_s + '=', @owner.send(to))
       end
     end

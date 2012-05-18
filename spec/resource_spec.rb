@@ -87,9 +87,9 @@ describe PlainRecord::Resource do
     class Callbacked
       include PlainRecord::Resource
       entry_in 'data/*/post.md'
-      property :title
-      text :summary
-      text :content
+      field :title
+      text  :summary
+      text  :content
     end
 
     callbacks  = mock()

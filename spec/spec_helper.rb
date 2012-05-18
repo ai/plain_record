@@ -5,9 +5,9 @@ class Post
 
   entry_in 'data/*/post.md'
 
-  property :title
-  text :summary
-  text :content
+  field :title
+  text  :summary
+  text  :content
 end
 
 class FilepathPost
@@ -18,7 +18,7 @@ class FilepathPost
   virtual :category, in_filepath(1)
   virtual :name,     in_filepath(2)
 
-  property :title
+  field   :title
 end
 
 class Author
@@ -26,9 +26,9 @@ class Author
 
   list_in 'data/authors/*.yml'
 
-  virtual  :type, in_filepath(1)
-  property :login
-  property :name
+  virtual :type, in_filepath(1)
+  field   :login
+  field   :name
 end
 
 PlainRecord.root = File.dirname(__FILE__)
@@ -44,8 +44,9 @@ INTERN = File.join(File.dirname(__FILE__), 'data/authors/intern.yml')
 EXTERN = File.join(File.dirname(__FILE__), 'data/authors/extern.yml')
 
 def model_methods(model)
-    (model.instance_methods - Object.instance_methods -
-        PlainRecord::Resource.instance_methods).map { |i| i.to_s }
+  (model.instance_methods  -
+   Object.instance_methods -
+   PlainRecord::Resource.instance_methods).map { |i| i.to_s }
 end
 
 RSpec::Matchers.define :has_methods do |*methods|

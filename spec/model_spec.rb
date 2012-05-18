@@ -7,7 +7,7 @@ describe PlainRecord::Model do
     Author.loaded = { }
   end
 
-  it "should define virtual property" do
+  it "should define virtual field" do
     klass = Class.new do
       include PlainRecord::Resource
       virtual :one, Definers.none
@@ -16,7 +16,7 @@ describe PlainRecord::Model do
     klass.virtuals.should == [:one]
   end
 
-  it "shouldn't define virtual property without accessor from definers" do
+  it "shouldn't define virtual field without accessor from definers" do
     lambda {
       Class.new do
         include PlainRecord::Resource
@@ -25,13 +25,13 @@ describe PlainRecord::Model do
     }.should raise_error(ArgumentError, /own accessors/)
   end
 
-  it "should define property" do
+  it "should define field" do
     klass = Class.new do
       include PlainRecord::Resource
-      property :one
+      field :one
     end
 
-    klass.properties.should == [:one]
+    klass.fields.should == [:one]
     object = klass.new(nil, { 'one' => 1 })
     object.one.should == 1
     object.one = 2
@@ -54,10 +54,10 @@ describe PlainRecord::Model do
   it "should call definer" do
     klass = Class.new do
       include PlainRecord::Resource
-      property :one, Definers.accessor
-      property :two, Definers.reader
-      text :three, Definers.writer
-      text :four, Definers.none
+      field :one,   Definers.accessor
+      field :two,   Definers.reader
+      text  :three, Definers.writer
+      text  :four,  Definers.none
     end
     klass.should has_methods(:one, :'one=', :'three=', :two)
   end
@@ -65,22 +65,22 @@ describe PlainRecord::Model do
   it "should use accessors from definers" do
     klass = Class.new do
       include PlainRecord::Resource
-      property :one, Definers.writer, Definers.reader, Definers.accessor
-      text :two, Definers.reader
+      field :one, Definers.writer, Definers.reader, Definers.accessor
+      text  :two, Definers.reader
     end
     klass.should has_methods(:two)
   end
 
-  it "should send property name and caller type to definer" do
+  it "should send field name and caller type to definer" do
     definer = mock
     definer.stub!(:virtual).with(:one, :virtual)
-    definer.stub!(:property).with(:two, :property)
+    definer.stub!(:field).with(:two,  :field)
     definer.stub!(:text).with(:three, :text)
     klass = Class.new do
       include PlainRecord::Resource
-      virtual  :one,   definer.method(:virtual)
-      property :two,   definer.method(:property)
-      text     :three, definer.method(:text)
+      virtual :one,   definer.method(:virtual)
+      field   :two,   definer.method(:field)
+      text    :three, definer.method(:text)
     end
   end
 

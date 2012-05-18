@@ -30,7 +30,7 @@ module PlainRecord
   # * <tt>save(entry)</tt> – write entry to file.
   # See PlainRecord::Callbacks for details.
   #
-  # You can define properties  from entry file path, by +in_filepath+ definer.
+  # You can define fields  from entry file path, by +in_filepath+ definer.
   # See PlainRecord::Filepath for details.
   #
   #   class Post
@@ -43,9 +43,9 @@ module PlainRecord
   #     end
   #
   #     virtual :name, in_filepath(1)
-  #     property :title
-  #     text :summary
-  #     text :content
+  #     field   :title
+  #     text    :summary
+  #     text    :content
   #   end
   module Resource
     class << self
@@ -54,7 +54,7 @@ module PlainRecord
       end
     end
 
-    # Properties values.
+    # Fields values.
     attr_reader :data
 
     # Texts values.
@@ -103,7 +103,7 @@ module PlainRecord
             self.file = self.class.path
           else
             raise ArgumentError, "There isn't file to save entry. " +
-                                 "Set filepath properties or file."
+                                 "Set filepath fields or file."
           end
         end
 
@@ -123,7 +123,7 @@ module PlainRecord
       @data.to_yaml(opts)
     end
 
-    # Compare if its properties and texts are equal.
+    # Compare if its fields and texts are equal.
     def eql?(other)
       return false unless other.kind_of?(self.class)
       @file == other.file and @data == other.data and @texts == @texts

@@ -10,7 +10,7 @@ describe PlainRecord::Associations do
     class ::RatedPost
       include PlainRecord::Resource
       entry_in 'data/3/post.md'
-      property :rate, one(::Rate)
+      field :rate, one(::Rate)
     end
 
     class ::Comment
@@ -21,9 +21,9 @@ describe PlainRecord::Associations do
       virtual :commented_post_name, in_filepath(1)
       virtual :commented_post,      one(::FilepathPost)
 
-      property :author_name
-      property :text
-      property :answers, many(::Comment)
+      field :author_name
+      field :text
+      field :answers, many(::Comment)
     end
 
     class ::CommentedPost

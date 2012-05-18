@@ -32,13 +32,13 @@ module PlainRecord
     include PlainRecord::Filepath
     include PlainRecord::Associations
 
-    # YAML properties names.
-    attr_accessor :properties
+    # YAML fields names.
+    attr_accessor :fields
 
-    # Name of special properties with big text.
+    # Name of special fields with big text.
     attr_accessor :texts
 
-    # Properties names with dynamic value.
+    # Fields names with dynamic value.
     attr_accessor :virtuals
 
     # Storage type: +:entry+ or +:list+.
@@ -48,10 +48,10 @@ module PlainRecord
     attr_accessor :loaded
 
     def self.extended(base) #:nodoc:
-      base.properties = []
-      base.virtuals   = []
-      base.texts      = []
-      base.loaded     = { }
+      base.fields   = []
+      base.virtuals = []
+      base.texts    = []
+      base.loaded   = { }
     end
 
     # Load and return all entries in +file+.
@@ -88,7 +88,7 @@ module PlainRecord
     # Return all entries, which is match for +matchers+ and return true on
     # +block+.
     #
-    # Matchers is a Hash with property name in key and String or Regexp for
+    # Matchers is a Hash with field name in key and String or Regexp for
     # match in value.
     #
     #   Post.all(title: 'Post title')
@@ -104,7 +104,7 @@ module PlainRecord
     # Return first entry, which is match for +matchers+ and return true on
     # +block+.
     #
-    # Matchers is a Hash with property name in key and String or Regexp for
+    # Matchers is a Hash with field name in key and String or Regexp for
     # match in value.
     #
     #   Post.first(title: 'Post title')
@@ -201,13 +201,13 @@ module PlainRecord
       self.extend PlainRecord::Model::List
     end
 
-    # Add virtual property with some +name+ to model. It value willn’t be in
+    # Add virtual field with some +name+ to model. It value willn’t be in
     # file and will be calculated dynamically.
     #
     # You _must_ provide your own define logic by +definers+. Definer Proc
-    # will be call with property name in first argument and may return
+    # will be call with field name in first argument and may return
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
-    # to access to property.
+    # to access to field.
     #
     #   class Post
     #     include PlainRecord::Resource
@@ -224,29 +224,29 @@ module PlainRecord
 
       if accessors[:reader] or accessors[:writer]
         raise ArgumentError, 'You must provide you own accessors for virtual ' +
-                             "property #{name}"
+                             "field #{name}"
       end
     end
 
-    # Add property with some +name+ to model. It will be stored as YAML.
+    # Add field with some +name+ to model. It will be stored as YAML.
     #
     # You can provide your own define logic by +definers+. Definer Proc
-    # will be call with property name in first argument and may return
+    # will be call with field name in first argument and may return
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
-    # to access to property.
+    # to access to field.
     #
     #   class Post
     #     include PlainRecord::Resource
     #
     #     entry_in 'posts/*/post.md'
     #
-    #     property :title
+    #     field :title
     #   end
-    def property(name, *definers)
-      @properties ||= []
-      @properties << name
+    def field(name, *definers)
+      @fields ||= []
+      @fields  << name
 
-      accessors = call_definers(definers, name, :property)
+      accessors = call_definers(definers, name, :field)
 
       if accessors[:reader]
         class_eval <<-EOS, __FILE__, __LINE__
@@ -264,13 +264,13 @@ module PlainRecord
       end
     end
 
-    # Add special property with big text (for example, blog entry content). It
-    # will stored after 3 dashes (<tt>---</tt>).
+    # Add special field with big text (for example, blog entry content).
+    # It will stored after 3 dashes (<tt>---</tt>).
     #
     # You can provide your own define logic by +definers+. Definer Proc
-    # will be call with property name in first argument and may return
+    # will be call with field name in first argument and may return
     # +:accessor+, +:writer+ or +:reader+ this method create standard methods
-    # to access to property.
+    # to access to field.
     #
     # Note, that text is supported by only +entry_in+ models, which entry store
     # in separated files.
@@ -284,9 +284,9 @@ module PlainRecord
     #
     #     entry_in 'posts/*/post.md'
     #
-    #     property :title
-    #     text :summary
-    #     text :content
+    #     field :title
+    #     text  :summary
+    #     text  :content
     #   end
     #
     # File:
@@ -323,9 +323,9 @@ module PlainRecord
       end
     end
 
-    # Call +definers+ from +caller+ (<tt>:virtual</tt>, <tt>:property</tt> or
-    # <tt>:text</tt>) for property with +name+ and return accessors, which will
-    # be created as standart by +property+ or +text+ method.
+    # Call +definers+ from +caller+ (<tt>:virtual</tt>, <tt>:field</tt> or
+    # <tt>:text</tt>) for field with +name+ and return accessors, which will
+    # be created as standart by +field+ or +text+ method.
     def call_definers(definers, name, caller)
       accessors = { :reader => true, :writer => true }
 

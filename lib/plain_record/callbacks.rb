@@ -22,7 +22,7 @@ module PlainRecord
   # Callbacks are hooks that allow you to define methods to run before and
   # after some method, to change it logic.
   module Callbacks
-    # Hash of class callbacks with property.
+    # Hash of class callbacks with field.
     attr_accessor :callbacks
 
     # Set block as callback before +events+. Callback with less +priority+ will

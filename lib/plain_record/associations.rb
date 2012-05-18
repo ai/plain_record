@@ -22,20 +22,20 @@ module PlainRecord
   # Extention for model to store or have link to another model. There is two
   # type of association.
   #
-  # == Virtual property
+  # == Virtual field
   # In +virtual+ method this definer create only _link_ to another model. When
-  # you try to use this virtual property, model will find association object by
+  # you try to use this virtual field, model will find association object by
   # rules in +map+.
   #
-  # Rules in +map+ is only Hash with model properties in key and association
-  # properties in value. For example, if model contain +name+ property and
+  # Rules in +map+ is only Hash with model fields in key and association
+  # fields in value. For example, if model contain +name+ field and
   # association must have +post_name+ with same value, +map+ will be 
   # <tt>{ :name => :post_name }</tt>.
   #
   # If you didn’t set +map+ definer will try to find it automatically:
-  # it will find in model and association class all property pairs, what have
-  # name like +property+ → <tt>model</tt>_<tt>property</tt>. For example,
-  # if model +Post+ have property +name+ and +Comment+ have +post_name+, you
+  # it will find in model and association class all field pairs, what have
+  # name like +field+ → <tt>model</tt>_<tt>field</tt>. For example,
+  # if model +Post+ have field +name+ and +Comment+ have +post_name+, you
   # may not set +map+ – definer will find it automatically.
   #
   #   class Review
@@ -43,9 +43,9 @@ module PlainRecord
   #
   #     entry_in 'reviews/*.md'
   #
-  #     virtual  :author, one(Author)
-  #     property :author_login
-  #     text     :review
+  #     virtual :author, one(Author)
+  #     field   :author_login
+  #     text    :review
   #   end
   #
   #   class Author
@@ -53,26 +53,26 @@ module PlainRecord
   #
   #     list_in 'authors.yml'
   #
-  #     virtual  :reviews, many(Review)
-  #     property :login
-  #     property :name
+  #     virtual :reviews, many(Review)
+  #     field   :login
+  #     field   :name
   #   end
   #
-  # == Real property
-  # If you will use this definer in +property+ method, association object data
+  # == Real field
+  # If you will use this definer in +field+ method, association object data
   # will store in you model file. For example model:
   #
   #   class Movie
   #     include PlainRecord::Resource
   #
-  #     property :title
-  #     property :genre
-  #     property :release_year
+  #     field :title
+  #     field :genre
+  #     field :release_year
   #   end
   #
   #   class Tag
   #     include PlainRecord::Resource
-  #     property :name
+  #     field :name
   #   end
   #
   #   class Review
@@ -80,10 +80,10 @@ module PlainRecord
   #
   #     entry_in 'reviews/*.md'
   #
-  #     property :author
-  #     property :movie, one(Movie)
-  #     property :tags, many(Tag)
-  #     text     :review
+  #     field :author
+  #     field :movie, one(Movie)
+  #     field :tags,  many(Tag)
+  #     text  :review
   #   end
   #
   # will be store as:
@@ -108,48 +108,48 @@ module PlainRecord
     private
 
     # Return definer for one-to-one association with +klass+. Have different
-    # logic in +property+ and +virtual+ methods.
+    # logic in +field+ and +virtual+ methods.
     def one(klass, map = { })
-      proc do |property, caller|
-        if :property == caller
-          Associations.define_real_one(self, property, klass)
+      proc do |field, caller|
+        if :field == caller
+          Associations.define_real_one(self, field, klass)
           :accessor
         elsif :virtual == caller
-          map = Associations.map(self, klass, "#{property}_") if map.empty?
-          Associations.define_link_one(self, klass, property, map)
+          map = Associations.map(self, klass, "#{field}_") if map.empty?
+          Associations.define_link_one(self, klass, field, map)
           nil
         else
-          raise ArgumentError, "You couldn't create association property" +
-                               " #{property} by text creator"
+          raise ArgumentError, "You couldn't create association field" +
+                               " #{field} by text creator"
         end
       end
     end
 
     # Return definer for one-to-many or many-to-many association with +klass+.
-    # Have different login in +property+ and +virtual+ methods.
+    # Have different login in +field+ and +virtual+ methods.
     def many(klass, prefix = nil, map = { })
-      proc do |property, caller|
-        if :property == caller
-          Associations.define_real_many(self, property, klass)
+      proc do |field, caller|
+        if :field == caller
+          Associations.define_real_many(self, field, klass)
           :accessor
         elsif :virtual == caller
           unless prefix
             prefix = self.to_s.gsub!(/[A-Z]/, '_\0')[1..-1].downcase + '_'
           end
           map = Associations.map(klass, self, prefix) if map.empty?
-          Associations.define_link_many(self, klass, property, map)
+          Associations.define_link_many(self, klass, field, map)
           nil
         else
-          raise ArgumentError, "You couldn't create association property" +
-                               " #{property} by text creator"
+          raise ArgumentError, "You couldn't create association field" +
+                               " #{field} by text creator"
         end
       end
     end
 
     class << self
-      # Define, that +property+ in +klass+ contain in file data from +model+.
-      def define_real_one(klass, property, model)
-        name = property.to_s
+      # Define, that +field+ in +klass+ contain in file data from +model+.
+      def define_real_one(klass, field, model)
+        name = field.to_s
         klass.after :load do |result, entry|
           entry.data[name] = model.new(entry.file, entry.data[name])
           result
@@ -165,10 +165,10 @@ module PlainRecord
         end
       end
 
-      # Define, that +property+ in +klass+ contain in file array of data from
+      # Define, that +field+ in +klass+ contain in file array of data from
       # +model+ objects.
-      def define_real_many(klass, property, model)
-        name = property.to_s
+      def define_real_many(klass, field, model)
+        name = field.to_s
         klass.after :load do |result, entry|
           if entry.data[name].is_a? Enumerable
             entry.data[name].map! { |i| model.new(entry.file, i) }
@@ -196,17 +196,17 @@ module PlainRecord
         end
       end
 
-      # Find properties pairs in +from+ and +to+ models, witch is like
+      # Find fields pairs in +from+ and +to+ models, witch is like
       # <tt>prefix</tt>_<tt>from</tt> → +to+.
       #
-      # For example, if Comment contain +post_name+ property and Post contain
+      # For example, if Comment contain +post_name+ field and Post contain
       # +name+:
       #
       #   Associations.map(Comment, Post, :post) #=> { :post_name => :name }
       def map(from, to, prefix)
-        from_fields = (from.properties + from.virtuals).map { |i| i.to_s }
+        from_fields = (from.fields + from.virtuals).map { |i| i.to_s }
         mapped = { }
-        (to.properties + to.virtuals).each do |to_field|
+        (to.fields + to.virtuals).each do |to_field|
           from_field = prefix + to_field.to_s
           if from_fields.include? from_field
             mapped[from_field.to_sym] = to_field
@@ -215,7 +215,7 @@ module PlainRecord
         mapped
       end
 
-      # Define that virtual property +name+ in +klass+ contain link to +model+
+      # Define that virtual field +name+ in +klass+ contain link to +model+
       # witch is finded by +map+.
       def define_link_one(klass, model, name, map)
         klass.association_cache ||= { }
@@ -242,7 +242,7 @@ module PlainRecord
         EOS
       end
 
-      # Define that virtual property +name+ in +klass+ contain links to +model+
+      # Define that virtual field +name+ in +klass+ contain links to +model+
       # witch are finded by +map+.
       def define_link_many(klass, model, name, map)
         klass.association_cache ||= { }
