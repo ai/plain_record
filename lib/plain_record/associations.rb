@@ -102,9 +102,6 @@ module PlainRecord
     # Hash with map for virtual associations.
     attr_accessor :association_maps
 
-    # Hash with cached values for virtual associations.
-    attr_accessor :association_cache
-
     private
 
     # Return definer for one-to-one association with +klass+. Have different
@@ -211,29 +208,35 @@ module PlainRecord
         mapped
       end
 
+      def init_association_cache(klass)
+        klass.after :load do |result, entry|
+          entry.instance_exec { @association_cache = { } }
+        end
+      end
+
       # Define that virtual field +name+ in +klass+ contain link to +model+
       # witch is finded by +map+.
       def define_link_one(klass, model, name, map)
-        klass.association_cache ||= { }
-        klass.association_maps  ||= { }
+        klass.association_maps ||= { }
         klass.association_maps[name] = map
+        init_association_cache(klass)
 
         klass.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
-            unless self.class.association_cache[:#{name}]
+            unless @association_cache.has_key? :#{name}
               search = Hash[
                 self.class.association_maps[:#{name}].map do |from, to|
                   [to, send(from)]
                 end]
-              self.class.association_cache[:#{name}] = #{model}.first(search)
+              @association_cache[:#{name}] = #{model}.first(search)
             end
-            self.class.association_cache[:#{name}]
+            @association_cache[:#{name}]
           end
           def #{name}=(value)
             self.class.association_maps[:#{name}].each do |from, to|
               value.send(to.to_s + '=', send(from))
             end
-            self.class.association_cache[:#{name}] = value
+            @association_cache[:#{name}] = value
           end
         EOS
       end
@@ -241,24 +244,24 @@ module PlainRecord
       # Define that virtual field +name+ in +klass+ contain links to +model+
       # witch are finded by +map+.
       def define_link_many(klass, model, name, map)
-        klass.association_cache ||= { }
-        klass.association_maps  ||= { }
+        klass.association_maps ||= { }
         klass.association_maps[name] = map
+        init_association_cache(klass)
 
         klass.class_eval <<-EOS, __FILE__, __LINE__
           def #{name}
-            unless self.class.association_cache[:#{name}]
+            unless @association_cache.has_key? :#{name}
               search = Hash[
                 self.class.association_maps[:#{name}].map do |from, to|
                   [from, send(to)]
                 end]
-              self.class.association_cache[:#{name}] = AssociationProxy.new(
+              @association_cache[:#{name}] = AssociationProxy.new(
                   #{model}.all(search), self, :#{name})
             end
-            self.class.association_cache[:#{name}]
+            @association_cache[:#{name}]
           end
           def #{name}=(values)
-            self.class.association_cache[:#{name}] = AssociationProxy.link(
+            @association_cache[:#{name}] = AssociationProxy.link(
                 values, self, :#{name})
           end
         EOS

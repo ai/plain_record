@@ -68,7 +68,7 @@ describe PlainRecord::Associations do
   end
 
   it "should load one-to-many real association" do
-    root = ::Comment.first()
+    root = ::Comment.first(:commented_post_name => '1')
     root.should have(1).answers
     root.answers[0].should be_instance_of(::Comment)
     root.answers[0].path.should == 'data/1/comments.yml'
@@ -78,10 +78,11 @@ describe PlainRecord::Associations do
   end
 
   it "should save one-to-many real association" do
+    comment = ::Comment.first(:commented_post_name => '1')
+
     file = StringIO.new
     File.should_receive(:open).with(anything(), 'w').and_yield(file)
-
-    ::Comment.first().save()
+    comment.save()
 
     file.should has_yaml([
       {
@@ -102,6 +103,9 @@ describe PlainRecord::Associations do
     post = ::FilepathPost.first(:name => '1')
     comment = ::Comment.first(:author_name => 'super1997')
     comment.commented_post.should == post
+
+    another = ::Comment.first(:commented_post_name => '2')
+    another.commented_post.should_not == post
   end
 
   it "should change one-to-one virtual association" do

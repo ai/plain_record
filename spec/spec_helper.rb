@@ -5,9 +5,9 @@ class Post
 
   entry_in 'data/*/post.md'
 
-  field :title
-  text  :summary
-  text  :content
+  field   :title
+  text    :summary
+  text    :content
 end
 
 class FilepathPost
