@@ -1,0 +1,9 @@
+== 0.2 (Smallpox)
+* Add associations.
+* Add special syntax for virtual properties.
+* Add properties from entry file name.
+* Add before/after callbacks.
+* Add support for models with all entries in one file.
+
+== 0.1 (Plague)
+* Initial release
