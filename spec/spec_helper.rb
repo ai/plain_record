@@ -61,18 +61,3 @@ RSpec::Matchers.define :has_yaml do |data|
     YAML.load(file.read).should == data
   end
 end
-
-class Definers
-  def self.accessor
-    proc { :accessor }
-  end
-  def self.writer
-    proc { :writer }
-  end
-  def self.reader
-    proc { :reader }
-  end
-  def self.none
-    proc { nil }
-  end
-end

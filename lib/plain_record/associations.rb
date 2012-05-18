@@ -110,14 +110,12 @@ module PlainRecord
     # Return definer for one-to-one association with +klass+. Have different
     # logic in +field+ and +virtual+ methods.
     def one(klass, map = { })
-      proc do |field, caller|
-        if :field == caller
-          Associations.define_real_one(self, field, klass)
-          :accessor
-        elsif :virtual == caller
-          map = Associations.map(self, klass, "#{field}_") if map.empty?
-          Associations.define_link_one(self, klass, field, map)
-          nil
+      proc do |model, field, type|
+        if :field == type
+          Associations.define_real_one(model, field, klass)
+        elsif :virtual == type
+          map = Associations.map(model, klass, "#{field}_") if map.empty?
+          Associations.define_link_one(model, klass, field, map)
         else
           raise ArgumentError, "You couldn't create association field" +
                                " #{field} by text creator"
@@ -128,17 +126,15 @@ module PlainRecord
     # Return definer for one-to-many or many-to-many association with +klass+.
     # Have different login in +field+ and +virtual+ methods.
     def many(klass, prefix = nil, map = { })
-      proc do |field, caller|
-        if :field == caller
-          Associations.define_real_many(self, field, klass)
-          :accessor
-        elsif :virtual == caller
+      proc do |model, field, type|
+        if :field == type
+          Associations.define_real_many(model, field, klass)
+        elsif :virtual == type
           unless prefix
             prefix = self.to_s.gsub!(/[A-Z]/, '_\0')[1..-1].downcase + '_'
           end
-          map = Associations.map(klass, self, prefix) if map.empty?
-          Associations.define_link_many(self, klass, field, map)
-          nil
+          map = Associations.map(klass, model, prefix) if map.empty?
+          Associations.define_link_many(model, klass, field, map)
         else
           raise ArgumentError, "You couldn't create association field" +
                                " #{field} by text creator"

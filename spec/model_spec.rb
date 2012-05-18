@@ -10,7 +10,7 @@ describe PlainRecord::Model do
   it "should define virtual field" do
     klass = Class.new do
       include PlainRecord::Resource
-      virtual :one, Definers.none
+      virtual :one, proc { }
     end
 
     klass.virtuals.should == [:one]
@@ -20,7 +20,7 @@ describe PlainRecord::Model do
     lambda {
       Class.new do
         include PlainRecord::Resource
-        virtual :one, Definers.reader
+        virtual :one
       end
     }.should raise_error(ArgumentError, /own accessors/)
   end
@@ -51,37 +51,35 @@ describe PlainRecord::Model do
     object.content.should == 'another'
   end
 
-  it "should call definer" do
-    klass = Class.new do
-      include PlainRecord::Resource
-      field :one,   Definers.accessor
-      field :two,   Definers.reader
-      text  :three, Definers.writer
-      text  :four,  Definers.none
-    end
-    klass.should has_methods(:one, :'one=', :'three=', :two)
-  end
-
-  it "should use accessors from definers" do
-    klass = Class.new do
-      include PlainRecord::Resource
-      field :one, Definers.writer, Definers.reader, Definers.accessor
-      text  :two, Definers.reader
-    end
-    klass.should has_methods(:two)
-  end
-
-  it "should send field name and caller type to definer" do
+  it "should send field name and type type to definer" do
+    klass   = Class.new
     definer = mock
-    definer.stub!(:virtual).with(:one, :virtual)
-    definer.stub!(:field).with(:two,  :field)
-    definer.stub!(:text).with(:three, :text)
-    klass = Class.new do
+    definer.stub!(:virtual).with(klass, :one, :virtual)
+    definer.stub!(:field).with(klass, :two,  :field)
+    definer.stub!(:text).with(klass, :three, :text)
+    klass.class_eval do
       include PlainRecord::Resource
       virtual :one,   definer.method(:virtual)
       field   :two,   definer.method(:field)
       text    :three, definer.method(:text)
     end
+  end
+
+  it "should override sustem accessors by definer" do
+    definer = proc do |model, name, type|
+      model.class_eval <<-EOS, __FILE__, __LINE__
+        def #{name}
+          2
+        end
+      EOS
+    end
+    klass = Class.new do
+      include PlainRecord::Resource
+      field :one, definer
+    end
+    a = klass.new
+    a.one = 1
+    a.one.should == 2
   end
 
   it "should find all enrty files by glob pattern" do

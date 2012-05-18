@@ -57,13 +57,12 @@ module PlainRecord
     # Return definer for filepath field for +number+ <tt>*</tt> or
     # <tt>**</tt> pattern in path.
     def in_filepath(number)
-      proc do |field, caller|
-        if :virtual != caller
+      proc do |model, field, type|
+        if :virtual != type
           raise ArgumentError, "You must create filepath field #{field}" +
                                ' virtual creator'
         end
-        Filepath.define_field(self, field, number)
-        nil
+        Filepath.define_field(model, field, number)
       end
     end
 

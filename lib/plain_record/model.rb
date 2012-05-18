@@ -205,9 +205,8 @@ module PlainRecord
     # file and will be calculated dynamically.
     #
     # You _must_ provide your own define logic by +definers+. Definer Proc
-    # will be call with field name in first argument and may return
-    # +:accessor+, +:writer+ or +:reader+ this method create standard methods
-    # to access to field.
+    # will be call with models class as first argument, field name as second and
+    # field type as second.
     #
     #   class Post
     #     include PlainRecord::Resource
@@ -220,20 +219,19 @@ module PlainRecord
       @virtuals ||= []
       @virtuals << name
 
-      accessors = call_definers(definers, name, :virtual)
-
-      if accessors[:reader] or accessors[:writer]
+      if definers.length.zero?
         raise ArgumentError, 'You must provide you own accessors for virtual ' +
                              "field #{name}"
       end
+
+      definers.each { |i| i.call(self, name, :virtual) }
     end
 
     # Add field with some +name+ to model. It will be stored as YAML.
     #
-    # You can provide your own define logic by +definers+. Definer Proc
-    # will be call with field name in first argument and may return
-    # +:accessor+, +:writer+ or +:reader+ this method create standard methods
-    # to access to field.
+    # You may provide your own define logic by +definers+. Definer Proc
+    # will be call with models class as first argument, field name as second and
+    # field type as second.
     #
     #   class Post
     #     include PlainRecord::Resource
@@ -246,31 +244,24 @@ module PlainRecord
       @fields ||= []
       @fields  << name
 
-      accessors = call_definers(definers, name, :field)
+      class_eval <<-EOS, __FILE__, __LINE__
+        def #{name}
+          @data['#{name}']
+        end
+        def #{name}=(value)
+          @data['#{name}'] = value
+        end
+      EOS
 
-      if accessors[:reader]
-        class_eval <<-EOS, __FILE__, __LINE__
-          def #{name}
-            @data['#{name}']
-          end
-        EOS
-      end
-      if accessors[:writer]
-        class_eval <<-EOS, __FILE__, __LINE__
-          def #{name}=(value)
-            @data['#{name}'] = value
-          end
-        EOS
-      end
+      definers.each { |i| i.call(self, name, :field) }
     end
 
     # Add special field with big text (for example, blog entry content).
     # It will stored after 3 dashes (<tt>---</tt>).
     #
-    # You can provide your own define logic by +definers+. Definer Proc
-    # will be call with field name in first argument and may return
-    # +:accessor+, +:writer+ or +:reader+ this method create standard methods
-    # to access to field.
+    # You may provide your own define logic by +definers+. Definer Proc
+    # will be call with models class as first argument, field name as second and
+    # field type as second.
     #
     # Note, that text is supported by only +entry_in+ models, which entry store
     # in separated files.
@@ -305,41 +296,16 @@ module PlainRecord
       @texts << name
       number = @texts.length - 1
 
-      accessors = call_definers(definers, name, :text)
-
-      if accessors[:reader]
-        class_eval <<-EOS, __FILE__, __LINE__
-          def #{name}
-            @texts[#{number}]
-          end
-        EOS
-      end
-      if accessors[:writer]
-        class_eval <<-EOS, __FILE__, __LINE__
-          def #{name}=(value)
-            @texts[#{number}] = value
-          end
-        EOS
-      end
-    end
-
-    # Call +definers+ from +caller+ (<tt>:virtual</tt>, <tt>:field</tt> or
-    # <tt>:text</tt>) for field with +name+ and return accessors, which will
-    # be created as standart by +field+ or +text+ method.
-    def call_definers(definers, name, caller)
-      accessors = { :reader => true, :writer => true }
-
-      definers.each do |definer|
-        access = definer.call(name, caller)
-        if :writer == access or access.nil?
-          accessors[:reader] = false
+      class_eval <<-EOS, __FILE__, __LINE__
+        def #{name}
+          @texts[#{number}]
         end
-        if :reader == access or access.nil?
-          accessors[:writer] = false
+        def #{name}=(value)
+          @texts[#{number}] = value
         end
-      end
+      EOS
 
-      accessors
+      definers.each { |i| i.call(self, name, :text) }
     end
   end
 end
