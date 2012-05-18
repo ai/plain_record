@@ -1,7 +1,8 @@
 =begin
 Module to be included into model class.
 
-Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
+Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>,
+sponsored by Evil Martians.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

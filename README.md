@@ -6,6 +6,10 @@ text files. It’s ideal for static generated sites, like blog or homepage.
 If you want to write another static website generator, you don’t need to write
 another file parser – you can use Plain Record.
 
+Sponsored by [Evil Martians].
+
+[Evil Martians]: http://evilmartians.com/
+
 ## How To
 
 For example we will create simple blog storage with posts and comments.
