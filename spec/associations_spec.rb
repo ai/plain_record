@@ -95,7 +95,7 @@ describe PlainRecord::Associations do
 
   it "should find map for virtual association" do
     PlainRecord::Associations.map(
-        ::Comment, ::CommentedPost, 'commented_post_').should == { 
+        ::Comment, ::CommentedPost, 'commented_post_').should == {
             :commented_post_name => :name }
   end
 
