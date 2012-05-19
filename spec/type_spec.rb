@@ -79,7 +79,7 @@ describe PlainRecord::Type do
     a.one.should == Time.at(0).utc
 
     a.one = Time.at(1).utc
-    a.data['one'].should == '1970-01-01 00:00:01 UTC'
+    a.data['one'].should =~ /1970-01-01 00:00:01 (UTC|GMT)/
 
     a.one = nil
     a.data['one'].should be_nil
