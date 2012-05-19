@@ -75,11 +75,11 @@ describe PlainRecord::Type do
     a = klass.new
     a.one.should be_nil
 
-    a.data['one'] = '1970-01-01 01:00:00 CET'
-    a.one.should == Time.parse('1970-01-01 01:00:00 CET')
+    a.data['one'] = '1970-01-01 00:00:00 UTC'
+    a.one.should == Time.at(0).utc
 
-    a.one = Time.at(1)
-    a.data['one'].should == '1970-01-01 01:00:01 CET'
+    a.one = Time.at(1).utc
+    a.data['one'].should == '1970-01-01 00:00:01 UTC'
 
     a.one = nil
     a.data['one'].should be_nil
