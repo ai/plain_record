@@ -78,6 +78,9 @@ describe PlainRecord::Type do
     a.data['one'] = '1970-01-01 00:00:00 UTC'
     a.one.should == Time.at(0).utc
 
+    a.data['one'] = Time.at(0).utc
+    a.one.should == Time.at(0).utc
+
     a.one = Time.at(1).utc
     a.data['one'].should =~ /1970-01-01 00:00:01 (UTC|GMT)/
 
@@ -97,8 +100,11 @@ describe PlainRecord::Type do
     a.data['one'] = '1970-01-01'
     a.one.should == Date.parse('1970-01-01')
 
+    a.data['one'] = Date.parse('1970-01-01')
+    a.one.should == Date.parse('1970-01-01')
+
     a.one = Date.parse('1970-01-02')
-    a.data['one'].should == '1970-01-02'
+    a.data['one'].should == Date.parse('1970-01-02')
 
     a.one = nil
     a.data['one'].should be_nil

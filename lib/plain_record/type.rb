@@ -49,6 +49,7 @@ module PlainRecord
       proc do |model, field, type|
         model.add_accessors <<-EOS, __FILE__, __LINE__
           def #{field}
+            v = super
             #{Type.parsers[klass]}
           end
           def #{field}=(v)
@@ -67,18 +68,18 @@ module PlainRecord
     end
 
     Type.parsers = {
-      String  => 'super ? super.to_s : nil',
-      Integer => 'super ? super.to_i : nil',
-      Float   => 'super ? super.to_f : nil',
-      Time    => 'super ? Time.parse(super) : nil',
-      Date    => 'super ? Date.parse(super) : nil'
+      String  => 'v ? v.to_s : v',
+      Integer => 'v ? v.to_i : v',
+      Float   => 'v ? v.to_f : v',
+      Time    => 'v.is_a?(String) ? Time.parse(v) : v',
+      Date    => 'v.is_a?(String) ? Date.parse(v) : v'
     }
     Type.stringifies = {
       String  => 'v ? v.to_s : v',
       Integer => 'v ? v.to_i : v',
       Float   => 'v ? v.to_f : v',
       Time    => 'v ? v.strftime("%Y-%m-%d %H:%M:%S %Z") : v',
-      Date    => 'v ? v.strftime("%Y-%m-%d") : v'
+      Date    => 'v'
     }
   end
 end
