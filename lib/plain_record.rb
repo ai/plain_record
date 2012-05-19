@@ -30,6 +30,7 @@ require dir + 'default'
 require dir + 'filepath'
 require dir + 'association_proxy'
 require dir + 'associations'
+require dir + 'type'
 require dir + 'model'
 require dir + 'resource'
 

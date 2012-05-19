@@ -32,6 +32,7 @@ module PlainRecord
     include PlainRecord::Default
     include PlainRecord::Filepath
     include PlainRecord::Associations
+    include PlainRecord::Type
 
     # YAML fields names.
     attr_accessor :fields

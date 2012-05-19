@@ -5,7 +5,6 @@ describe PlainRecord::Default do
   it "should set default value for field" do
     klass = Class.new do
       include PlainRecord::Resource
-      entry_in 'data/*/post.md'
       field :category, default('uncategorized')
     end
     post = klass.new
