@@ -16,7 +16,7 @@ describe PlainRecord::Model do
     klass.virtuals.should == [:one]
   end
 
-  it "shouldn't define virtual field without accessor from definers" do
+  it "shouldn't define virtual field without accessor from filters" do
     lambda {
       Class.new do
         include PlainRecord::Resource
@@ -55,22 +55,22 @@ describe PlainRecord::Model do
     object.content.should == 'another'
   end
 
-  it "should send field name and type type to definer" do
+  it "should send field name and type type to filter" do
     klass   = Class.new
-    definer = mock
-    definer.stub!(:virtual).with(klass, :one, :virtual)
-    definer.stub!(:field).with(klass, :two,  :field)
-    definer.stub!(:text).with(klass, :three, :text)
+    filter = mock
+    filter.stub!(:virtual).with(klass, :one, :virtual)
+    filter.stub!(:field).with(klass, :two,  :field)
+    filter.stub!(:text).with(klass, :three, :text)
     klass.class_eval do
       include PlainRecord::Resource
-      virtual :one,   definer.method(:virtual)
-      field   :two,   definer.method(:field)
-      text    :three, definer.method(:text)
+      virtual :one,   filter.method(:virtual)
+      field   :two,   filter.method(:field)
+      text    :three, filter.method(:text)
     end
   end
 
-  it "should override sustem accessors by definer" do
-    definer = proc do |model, name, type|
+  it "should override sustem accessors by filter" do
+    filter = proc do |model, name, type|
       model.add_accessors.module_eval <<-EOS, __FILE__, __LINE__
         def #{name}
           super + 1
@@ -79,7 +79,7 @@ describe PlainRecord::Model do
     end
     klass = Class.new do
       include PlainRecord::Resource
-      field :one, definer
+      field :one, filter
     end
     a = klass.new
     a.one = 1

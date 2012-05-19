@@ -30,7 +30,7 @@ module PlainRecord
   # * <tt>save(entry)</tt> – write entry to file.
   # See PlainRecord::Callbacks for details.
   #
-  # You can define fields  from entry file path, by +in_filepath+ definer.
+  # You can define fields from entry file path, by +in_filepath+ filter.
   # See PlainRecord::Filepath for details.
   #
   #   class Post

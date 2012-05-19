@@ -234,7 +234,7 @@ module PlainRecord
     # Add virtual field with some +name+ to model. It value willn’t be in
     # file and will be calculated dynamically.
     #
-    # You _must_ provide your own define logic by +definers+. Definer Proc
+    # You _must_ provide your own define logic by +filters+. Filter Proc
     # will be call with models class as first argument, field name as second and
     # field type as second.
     #
@@ -245,22 +245,22 @@ module PlainRecord
     #
     #     virtual :name, in_filepath(1)
     #   end
-    def virtual(name, *definers)
+    def virtual(name, *filters)
       @virtuals ||= []
       @virtuals << name
 
-      if definers.length.zero?
+      if filters.length.zero?
         raise ArgumentError, 'You must provide you own accessors for virtual ' +
-                             "field #{name}"
+                             "field #{name} by any filter"
       end
 
-      definers.each { |i| i.call(self, name, :virtual) }
+      filters.each { |i| i.call(self, name, :virtual) }
     end
 
     # Add field with some +name+ to model. It will be stored as YAML.
     #
-    # You may provide your own define logic by +definers+. Definer Proc
-    # will be call with models class as first argument, field name as second and
+    # You may provide your own define logic by +filters+. Filter Proc will be
+    # call with models class as first argument, field name as second and
     # field type as second.
     #
     #   class Post
@@ -270,7 +270,7 @@ module PlainRecord
     #
     #     field :title
     #   end
-    def field(name, *definers)
+    def field(name, *filters)
       @fields ||= []
       @fields  << name
 
@@ -283,14 +283,14 @@ module PlainRecord
         end
       EOS
 
-      definers.each { |i| i.call(self, name, :field) }
+      filters.each { |i| i.call(self, name, :field) }
     end
 
     # Add special field with big text (for example, blog entry content).
     # It will stored after 3 dashes (<tt>---</tt>).
     #
-    # You may provide your own define logic by +definers+. Definer Proc
-    # will be call with models class as first argument, field name as second and
+    # You may provide your own define logic by +filter+. Filter Proc  will be
+    # call with models class as first argument, field name as second and
     # field type as second.
     #
     # Note, that text is supported by only +entry_in+ models, which entry store
@@ -317,7 +317,7 @@ module PlainRecord
     #   Post summary
     #   ---
     #   Post text
-    def text(name, *definers)
+    def text(name, *filters)
       if :list == @storage
         raise ArgumentError, 'Text is supported by only entry_in models'
       end
@@ -335,7 +335,7 @@ module PlainRecord
         end
       EOS
 
-      definers.each { |i| i.call(self, name, :text) }
+      filters.each { |i| i.call(self, name, :text) }
     end
   end
 end

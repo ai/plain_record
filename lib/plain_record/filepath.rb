@@ -27,7 +27,7 @@ module PlainRecord
   # To define filepath field:
   # 1. Use <tt>*</tt> or <tt>**</tt> pattern in model path in +enrty_in+ or
   #    +list_in+.
-  # 2. In +virtual+ method use <tt>in_filepath(i)</tt> definer after name with
+  # 2. In +virtual+ method use <tt>in_filepath(i)</tt> filter after name with
   #    <tt>*</tt> or <tt>**</tt> number (start from 1).
   #
   # Define filepath field only after +entry_in+ or +list_in+ call.
@@ -54,7 +54,7 @@ module PlainRecord
 
     private
 
-    # Return definer for filepath field for +number+ <tt>*</tt> or
+    # Return filter for filepath field for +number+ <tt>*</tt> or
     # <tt>**</tt> pattern in path.
     def in_filepath(number)
       proc do |model, field, type|

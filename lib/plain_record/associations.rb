@@ -23,7 +23,7 @@ module PlainRecord
   # type of association.
   #
   # == Virtual field
-  # In +virtual+ method this definer create only _link_ to another model. When
+  # In +virtual+ method this filter create only _link_ to another model. When
   # you try to use this virtual field, model will find association object by
   # rules in +map+.
   #
@@ -32,11 +32,11 @@ module PlainRecord
   # association must have +post_name+ with same value, +map+ will be 
   # <tt>{ :name => :post_name }</tt>.
   #
-  # If you didn’t set +map+ definer will try to find it automatically:
+  # If you didn’t set +map+ filter will try to find it automatically:
   # it will find in model and association class all field pairs, what have
   # name like +field+ → <tt>model</tt>_<tt>field</tt>. For example,
   # if model +Post+ have field +name+ and +Comment+ have +post_name+, you
-  # may not set +map+ – definer will find it automatically.
+  # may not set +map+ – filter will find it automatically.
   #
   #   class Review
   #     include PlainRecord::Resource
@@ -59,7 +59,7 @@ module PlainRecord
   #   end
   #
   # == Real field
-  # If you will use this definer in +field+ method, association object data
+  # If you will use this filter in +field+ method, association object data
   # will store in you model file. For example model:
   #
   #   class Movie
@@ -104,7 +104,7 @@ module PlainRecord
 
     private
 
-    # Return definer for one-to-one association with +klass+. Have different
+    # Return filter for one-to-one association with +klass+. Have different
     # logic in +field+ and +virtual+ methods.
     def one(klass, map = { })
       proc do |model, field, type|
@@ -120,7 +120,7 @@ module PlainRecord
       end
     end
 
-    # Return definer for one-to-many or many-to-many association with +klass+.
+    # Return filter for one-to-many or many-to-many association with +klass+.
     # Have different login in +field+ and +virtual+ methods.
     def many(klass, prefix = nil, map = { })
       proc do |model, field, type|
