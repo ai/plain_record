@@ -71,7 +71,7 @@ describe PlainRecord::Model do
 
   it "should override sustem accessors by filter" do
     filter = proc do |model, name, type|
-      model.add_accessors.module_eval <<-EOS, __FILE__, __LINE__
+      model.add_accessors <<-EOS, __FILE__, __LINE__
         def #{name}
           super + 1
         end
@@ -236,6 +236,19 @@ describe PlainRecord::Model do
     mod.should_not == main
     klass.add_accessors.should_not == mod
     klass.accessors_modules.should have(1).keys
+  end
+
+  it "should define accessors" do
+    klass = Class.new do
+      include PlainRecord::Resource
+    end
+    klass.add_accessors :one, "def one; 1; end"
+    klass.add_accessors       "def two; 2; end"
+    klass.add_accessors <<-EOS, __FILE__, __LINE__
+       def three; 3; end
+    EOS
+
+    klass.should has_methods(:one, :two, :three)
   end
 
 end

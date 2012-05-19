@@ -44,7 +44,7 @@ module PlainRecord
         Default.install(model) unless model.default_values
         model.default_values[field] = value
 
-        model.add_accessors(:default).module_eval <<-EOS, __FILE__, __LINE__
+        model.add_accessors <<-EOS, __FILE__, __LINE__
           def #{field}
             super || self.class.default_values[:#{field}]
           end

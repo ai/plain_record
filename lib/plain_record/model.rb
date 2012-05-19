@@ -151,22 +151,40 @@ module PlainRecord
     # It is helper to create model fields accessors and filters for it with
     # +super+ support.
     #
-    #   add_accessors.module_eval <<-EOS, __FILE__, __LINE__
+    #   add_accessors <<-EOS, __FILE__, __LINE__
     #     def #{name}
     #       @data['#{name}']
     #     end
     #   EOS
-    def add_accessors(name = nil)
+    def add_accessors(name = nil, file = nil, line = nil, code = nil)
+      if name.is_a? String
+        code = line
+        line = file
+        file = name
+        name = nil
+      end
+
+      if file and code.nil?
+        code = file
+        file = line = nil
+      end
+
       if name and @accessors_modules.has_key? name
-        @accessors_modules[name]
+        mod = @accessors_modules[name]
       else
         mod = Module.new
         if name
           @accessors_modules[name] = mod
         end
         include mod
-        mod
       end
+
+      if file and code
+        mod.module_eval(file, line, code)
+      elsif code
+        mod.module_eval(code)
+      end
+      mod
     end
 
     private
@@ -275,7 +293,7 @@ module PlainRecord
       @fields ||= []
       @fields  << name
 
-      add_accessors(:main).module_eval <<-EOS, __FILE__, __LINE__
+      add_accessors :main, <<-EOS, __FILE__, __LINE__
         def #{name}
           @data['#{name}']
         end
@@ -327,7 +345,7 @@ module PlainRecord
       @texts << name
       number = @texts.length - 1
 
-      add_accessors(:main).module_eval <<-EOS, __FILE__, __LINE__
+      add_accessors :main, <<-EOS, __FILE__, __LINE__
         def #{name}
           @texts[#{number}]
         end

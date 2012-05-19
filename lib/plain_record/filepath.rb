@@ -66,7 +66,7 @@ module PlainRecord
         Filepath.install(model) unless model.filepath_fields
         model.filepath_fields[number] = field
 
-        model.add_accessors(:filepath).module_eval <<-EOS, __FILE__, __LINE__
+        model.add_accessors <<-EOS, __FILE__, __LINE__
           def #{field}
             @filepath_data[:#{field}]
           end
