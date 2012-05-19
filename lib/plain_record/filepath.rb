@@ -127,7 +127,7 @@ module PlainRecord
 
         klass.filepath_fields[number] = name
 
-        klass.class_eval <<-EOS, __FILE__, __LINE__
+        klass.add_accessors(:filepath).module_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             @filepath_data[:#{name}]
           end

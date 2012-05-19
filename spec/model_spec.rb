@@ -32,6 +32,8 @@ describe PlainRecord::Model do
     end
 
     klass.fields.should == [:one]
+    klass.accessors_modules[:main].should has_methods(:one, :one=)
+
     object = klass.new(nil, { 'one' => 1 })
     object.one.should == 1
     object.one = 2
@@ -45,6 +47,8 @@ describe PlainRecord::Model do
     end
 
     klass.texts.should == [:content]
+    klass.accessors_modules[:main].should has_methods(:content, :content=)
+
     object = klass.new(nil, { }, ['text'])
     object.content.should == 'text'
     object.content = 'another'
@@ -67,9 +71,9 @@ describe PlainRecord::Model do
 
   it "should override sustem accessors by definer" do
     definer = proc do |model, name, type|
-      model.class_eval <<-EOS, __FILE__, __LINE__
+      model.add_accessors.module_eval <<-EOS, __FILE__, __LINE__
         def #{name}
-          2
+          super + 1
         end
       EOS
     end
@@ -215,6 +219,23 @@ describe PlainRecord::Model do
       author.file = 'file'
       author.save
     end
+  end
+
+  it "should add modules for accessors" do
+    klass = Class.new do
+      include PlainRecord::Resource
+    end
+
+    klass.accessors_modules.should be_empty
+
+    main = klass.add_accessors(:main)
+    klass.add_accessors(:main).should == main
+    klass.accessors_modules.should have(1).keys
+
+    mod = klass.add_accessors
+    mod.should_not == main
+    klass.add_accessors.should_not == mod
+    klass.accessors_modules.should have(1).keys
   end
 
 end

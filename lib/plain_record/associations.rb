@@ -221,7 +221,7 @@ module PlainRecord
         klass.association_maps[name] = map
         init_association_cache(klass)
 
-        klass.class_eval <<-EOS, __FILE__, __LINE__
+        klass.add_accessors(:association).module_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             unless @association_cache.has_key? :#{name}
               search = Hash[
@@ -248,7 +248,7 @@ module PlainRecord
         klass.association_maps[name] = map
         init_association_cache(klass)
 
-        klass.class_eval <<-EOS, __FILE__, __LINE__
+        klass.add_accessors(:association).module_eval <<-EOS, __FILE__, __LINE__
           def #{name}
             unless @association_cache.has_key? :#{name}
               search = Hash[

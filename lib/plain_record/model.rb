@@ -47,11 +47,15 @@ module PlainRecord
     # Content of already loaded files.
     attr_accessor :loaded
 
+    # Named modules, created by +add_accessors+.
+    attr_accessor :accessors_modules
+
     def self.extended(base) #:nodoc:
       base.fields   = []
       base.virtuals = []
       base.texts    = []
       base.loaded   = { }
+      base.accessors_modules = { }
     end
 
     # Load and return all entries in +file+.
@@ -135,6 +139,32 @@ module PlainRecord
     def path(matchers = { })
       use_callbacks(:path, matchers) do
         @path
+      end
+    end
+
+    # Create new anonymous module and include in model.
+    #
+    # You can set +name+ and it will old module, if it was created with same
+    # name.
+    #
+    # It is helper to create model fields accessors and filters for it with
+    # +super+ support.
+    #
+    #   add_accessors.module_eval <<-EOS, __FILE__, __LINE__
+    #     def #{name}
+    #       @data['#{name}']
+    #     end
+    #   EOS
+    def add_accessors(name = nil)
+      if name and @accessors_modules.has_key? name
+        @accessors_modules[name]
+      else
+        mod = Module.new
+        if name
+          @accessors_modules[name] = mod
+        end
+        include mod
+        mod
       end
     end
 
@@ -244,7 +274,7 @@ module PlainRecord
       @fields ||= []
       @fields  << name
 
-      class_eval <<-EOS, __FILE__, __LINE__
+      add_accessors(:main).module_eval <<-EOS, __FILE__, __LINE__
         def #{name}
           @data['#{name}']
         end
@@ -296,7 +326,7 @@ module PlainRecord
       @texts << name
       number = @texts.length - 1
 
-      class_eval <<-EOS, __FILE__, __LINE__
+      add_accessors(:main).module_eval <<-EOS, __FILE__, __LINE__
         def #{name}
           @texts[#{number}]
         end
