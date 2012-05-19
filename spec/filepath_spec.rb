@@ -15,7 +15,7 @@ describe PlainRecord::Filepath do
   it "should load filepath field" do
     best = FilepathPost.first(:title => 'Best')
     best.category.should == 'best/'
-    best.name.should == '4'
+    best.name.should     == '4'
   end
 
   it "should load filepath field as nil when ** pattern is empty" do

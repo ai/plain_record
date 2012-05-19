@@ -37,7 +37,7 @@ For example we will create simple blog storage with posts and comments.
 
       virtual :name,     in_filepath(1)
       virtual :comments, many(Comment)
-      field   :title
+      field   :title     default("Untitled")
       field   :tags
       text    :summary
       text    :content

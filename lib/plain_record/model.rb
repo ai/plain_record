@@ -29,6 +29,7 @@ module PlainRecord
     autoload :List,  (dir + 'list').to_s
 
     include PlainRecord::Callbacks
+    include PlainRecord::Default
     include PlainRecord::Filepath
     include PlainRecord::Associations
 

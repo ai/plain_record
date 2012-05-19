@@ -62,7 +62,18 @@ module PlainRecord
           raise ArgumentError, "You must create filepath field #{field}" +
                                ' virtual creator'
         end
-        Filepath.define_field(model, field, number)
+
+        Filepath.install(model) unless model.filepath_fields
+        model.filepath_fields[number] = field
+
+        model.add_accessors(:filepath).module_eval <<-EOS, __FILE__, __LINE__
+          def #{field}
+            @filepath_data[:#{field}]
+          end
+          def #{field}=(value)
+            @filepath_data[:#{field}] = value
+          end
+        EOS
       end
     end
 
@@ -116,25 +127,6 @@ module PlainRecord
             entry.file = path unless path =~ /[\*\[\?\{]/
           end
         end
-      end
-
-      # Define in +klass+ filepath field with +name+ for +number+ <tt>*</tt>
-      # or <tt>**</tt> pattern in path.
-      def define_field(klass, name, number)
-        unless klass.filepath_fields
-          install(klass)
-        end
-
-        klass.filepath_fields[number] = name
-
-        klass.add_accessors(:filepath).module_eval <<-EOS, __FILE__, __LINE__
-          def #{name}
-            @filepath_data[:#{name}]
-          end
-          def #{name}=(value)
-            @filepath_data[:#{name}] = value
-          end
-        EOS
       end
     end
   end

@@ -26,6 +26,7 @@ YAML::ENGINE.yamler = 'syck' if defined? YAML::ENGINE
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'version'
 require dir + 'callbacks'
+require dir + 'default'
 require dir + 'filepath'
 require dir + 'association_proxy'
 require dir + 'associations'
