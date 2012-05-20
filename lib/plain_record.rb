@@ -36,7 +36,8 @@ require dir + 'resource'
 
 module PlainRecord
   module Extra
-    autoload :Git, 'plain_record/extra/git'
+    autoload :Git,  'plain_record/extra/git'
+    autoload :I18n, 'plain_record/extra/i18n'
   end
 
   class << self

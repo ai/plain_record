@@ -66,6 +66,9 @@ module PlainRecord::Extra
     end
 
     module Model
+
+      private
+
       # Filter to set default value to time of last file git commit.
       # If file is not commited or has changes, filter will return `Time.now`.
       def git_modified_time

@@ -42,7 +42,7 @@ module PlainRecord
     # Filter to set default field value.
     def default(value)
       proc do |model, field, type|
-        Default.install(model) unless model.default_values
+        model.default_values ||= { }
         model.default_values[field] = value
 
         model.add_accessors <<-EOS, __FILE__, __LINE__
@@ -50,14 +50,6 @@ module PlainRecord
             super || self.class.default_values[:#{field}]
           end
         EOS
-      end
-    end
-
-    class << self
-      # Define class variables and events in +klass+. It should be call once on
-      # same class after +entry_in+ or +list_in+ call.
-      def install(klass)
-        klass.default_values = { }
       end
     end
   end

@@ -295,7 +295,7 @@ module PlainRecord
       @fields  << name
 
       add_accessors :main, <<-EOS, __FILE__, __LINE__
-        def #{name}
+        def #{name}(*params)
           @data['#{name}']
         end
         def #{name}=(value)
