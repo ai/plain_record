@@ -35,6 +35,8 @@ require dir + 'model'
 require dir + 'resource'
 
 module PlainRecord
+  autoload :Git, 'plain_record/git'
+
   class << self
     # Set new root for Model#entry_in or Model#list_in.
     #
