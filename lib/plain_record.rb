@@ -59,3 +59,9 @@ module PlainRecord
     end
   end
 end
+
+if defined? Rails
+  ActiveSupport.on_load(:after_initialize) do
+    PlainRecord.root = Rails.root.join('data')
+  end
+end
