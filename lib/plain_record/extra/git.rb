@@ -18,18 +18,18 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-module PlainRecord
+module PlainRecord::Extra
   # Extention to get time from git commits of model file.
   #
   # It make sense only with `entry_in` models. You can get created or modified
   # time from first or last git commit time.
   #
-  # It is additional extention, so you need to include `PlainRecord::Git`
+  # It is additional extention, so you need to include `PlainRecord::Extra::Git`
   # module to your model.
   #
   #   class Post
   #     include PlainRecord::Resource
-  #     include PlainRecord::Git
+  #     include PlainRecord::Extra::Git
   #
   #     virtual :created_at, git_created_time
   #     virtual :updated_at, git_modify_time

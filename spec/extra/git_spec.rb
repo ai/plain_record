@@ -1,11 +1,11 @@
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require File.join(File.dirname(__FILE__), '../spec_helper')
 
-describe PlainRecord::Git do
+describe PlainRecord::Extra::Git do
 
   before :all do
     class TimedPost
       include PlainRecord::Resource
-      include PlainRecord::Git
+      include PlainRecord::Extra::Git
 
       entry_in 'data/*/post.md'
 
