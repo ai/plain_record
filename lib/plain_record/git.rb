@@ -36,7 +36,7 @@ module PlainRecord
   #   end
   module Git
     class << self
-      def included(base) #:nodoc:
+      def included(base)
         base.send :extend, Model
       end
     end
@@ -66,6 +66,8 @@ module PlainRecord
     end
 
     module Model
+      # Filter to set default value to time of last file git commit.
+      # If file is not commited or has changes, filter will return `Time.now`.
       def git_modified_time
         proc do |model, name, type|
           model.add_accessors <<-EOS, __FILE__, __LINE__
@@ -76,6 +78,8 @@ module PlainRecord
         end
       end
 
+      # Filter to set default value to time of first file git commit.
+      # If file is not commited or has changes, filter will return `Time.now`.
       def git_created_time
         proc do |model, name, type|
           model.add_accessors <<-EOS, __FILE__, __LINE__

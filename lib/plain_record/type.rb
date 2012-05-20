@@ -45,6 +45,7 @@ module PlainRecord
 
     private
 
+    # Filter to convert field values to some type.
     def type(klass)
       proc do |model, field, type|
         model.add_accessors <<-EOS, __FILE__, __LINE__

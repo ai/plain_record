@@ -52,7 +52,7 @@ module PlainRecord
     # Named modules, created by +add_accessors+.
     attr_accessor :accessors_modules
 
-    def self.extended(base) #:nodoc:
+    def self.extended(base)
       base.fields   = []
       base.virtuals = []
       base.texts    = []

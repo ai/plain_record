@@ -49,7 +49,7 @@ module PlainRecord
   #   end
   module Resource
     class << self
-      def included(base) #:nodoc:
+      def included(base)
         base.send :extend, Model
       end
     end

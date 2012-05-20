@@ -39,6 +39,7 @@ module PlainRecord
 
     private
 
+    # Filter to set default field value.
     def default(value)
       proc do |model, field, type|
         Default.install(model) unless model.default_values
