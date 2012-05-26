@@ -251,4 +251,13 @@ describe PlainRecord::Model do
     klass.should has_methods(:one, :two, :three)
   end
 
+  it "should allow to define filters as Hash" do
+    klass = Class.new do
+      include PlainRecord::Resource
+      field :one, :default => 1
+    end
+    a = klass.new
+    a.one.should == 1
+  end
+
 end

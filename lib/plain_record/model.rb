@@ -274,7 +274,7 @@ module PlainRecord
                              "field #{name} by any filter"
       end
 
-      filters.each { |i| i.call(self, name, :virtual) }
+      field_filters(filters, name, :virtual)
     end
 
     # Add field with some +name+ to model. It will be stored as YAML.
@@ -303,7 +303,7 @@ module PlainRecord
         end
       EOS
 
-      filters.each { |i| i.call(self, name, :field) }
+      field_filters(filters, name, :field)
     end
 
     # Add special field with big text (for example, blog entry content).
@@ -355,7 +355,19 @@ module PlainRecord
         end
       EOS
 
-      filters.each { |i| i.call(self, name, :text) }
+      field_filters(filters, name, :text)
+    end
+
+    # Call all +filters+ for some +field+ with +type+.
+    def field_filters(filters, field, type)
+      filters.each do |filter|
+        if filter.is_a? Hash
+          filter = filter.map { |name, param| send(name, param) }
+          field_filters(filter, field, type)
+        else
+          filter.call(self, field, type)
+        end
+      end
     end
   end
 end
