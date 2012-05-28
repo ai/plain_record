@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
                'readable plain text files.'
   s.description = <<-EOF
     Plain Record is a data persistence, which use human editable and
-    readable plain text files. It’s ideal for static generated sites,
+    readable plain text files. It's ideal for static generated sites,
     like blog or homepage.
   EOF
 
