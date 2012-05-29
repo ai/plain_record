@@ -88,7 +88,7 @@ module PlainRecord
   #
   # will be store as:
   #
-  #   author: John Smith 
+  #   author: John Smith
   #   movie:
   #     title: Watchmen
   #     genre: action

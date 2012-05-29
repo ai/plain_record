@@ -47,10 +47,8 @@ module PlainRecord::Extra
   #     end
   #   end
   module I18n
-    class << self
-      def included(base)
-        base.send :extend, Model
-      end
+    def self.included(base)
+      base.send :extend, Model
     end
 
     # Return default locale. By default it look in R18n or Rails I18n.

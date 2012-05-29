@@ -44,7 +44,7 @@ module PlainRecord
     attr_accessor :virtuals
 
     # Storage type: +:entry+ or +:list+.
-    attr_reader :storage
+    attr_reader   :storage
 
     # Content of already loaded files.
     attr_accessor :loaded
@@ -85,8 +85,8 @@ module PlainRecord
     # Write all loaded entries to +file+.
     def save_file(file)
       if @loaded.has_key? file
-        File.open(file, 'w') do |io|
-          io.write entries_string(@loaded[file]).slice(5..-1)
+        ::File.open(file, 'w') do |io|
+          io << entries_string(@loaded[file]).slice(5..-1)
         end
       end
     end
@@ -202,7 +202,7 @@ module PlainRecord
 
     # Delete file, cache and empty dirs in path.
     def delete_file(file)
-      File.delete(file)
+      ::File.delete(file)
       @loaded.delete(file)
 
       path = Pathname(file).dirname

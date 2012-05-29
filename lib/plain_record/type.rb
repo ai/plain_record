@@ -75,6 +75,7 @@ module PlainRecord
       Time    => 'v.is_a?(String) ? Time.parse(v) : v',
       Date    => 'v.is_a?(String) ? Date.parse(v) : v'
     }
+
     Type.stringifies = {
       String  => 'v ? v.to_s : v',
       Integer => 'v ? v.to_i : v',
@@ -82,5 +83,6 @@ module PlainRecord
       Time    => 'v ? v.strftime("%Y-%m-%d %H:%M:%S %Z") : v',
       Date    => 'v'
     }
+
   end
 end

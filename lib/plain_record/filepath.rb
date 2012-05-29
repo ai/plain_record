@@ -77,57 +77,56 @@ module PlainRecord
       end
     end
 
-    class << self
-      # Define class variables and events in +klass+. It should be call once on
-      # same class after +entry_in+ or +list_in+ call.
-      def install(klass)
-        klass.filepath_fields = { }
+    # Define class variables and events in +klass+. It should be call once on
+    # same class after +entry_in+ or +list_in+ call.
+    def self.install(klass)
+      klass.filepath_fields = { }
 
-        path = Regexp.escape(klass.path).gsub(/\\\*\\\*(\/|$)/, '(.*)').
-                                         gsub('\\*', '([^/]+)')
-        klass.filepath_regexp = Regexp.new(path)
+      path = Regexp.escape(klass.path).gsub(/\\\*\\\*(\/|$)/, '(.*)').
+                                       gsub('\\*', '([^/]+)')
+      klass.filepath_regexp = Regexp.new(path)
 
-        klass.class_eval do
-          attr_accessor :filepath_data
+      klass.class_eval do
+        attr_accessor :filepath_data
+      end
+
+      klass.after :load do |result, entry|
+        if entry.path
+          data = klass.filepath_regexp.match(entry.path)
+          entry.filepath_data = { }
+          klass.filepath_fields.each_pair do |number, name|
+            entry.filepath_data[name] = data[number]
+          end
+        else
+          entry.filepath_data = { }
+          klass.filepath_fields.each_value do |name|
+            entry.filepath_data[name] = entry.data[name]
+            entry.data.delete(name)
+          end
         end
+        result
+      end
 
-        klass.after :load do |result, entry|
-          if entry.path
-            data = klass.filepath_regexp.match(entry.path)
-            entry.filepath_data = { }
-            klass.filepath_fields.each_pair do |number, name|
-              entry.filepath_data[name] = data[number]
-            end
+      klass.after :path do |path, matchers|
+        i = 0
+        path.gsub /(\*\*(\/|$)|\*)/ do |pattern|
+          i += 1
+          field = klass.filepath_fields[i]
+          unless matchers[field].is_a? Regexp or matchers[field].nil?
+            matchers[field]
           else
-            entry.filepath_data = { }
-            klass.filepath_fields.each_value do |name|
-              entry.filepath_data[name] = entry.data[name]
-              entry.data.delete(name)
-            end
-          end
-          result
-        end
-
-        klass.after :path do |path, matchers|
-          i = 0
-          path.gsub /(\*\*(\/|$)|\*)/ do |pattern|
-            i += 1
-            field = klass.filepath_fields[i]
-            unless matchers[field].is_a? Regexp or matchers[field].nil?
-              matchers[field]
-            else
-              pattern
-            end
-          end
-        end
-
-        klass.before :save do |entry|
-          unless entry.file
-            path = klass.path(entry.filepath_data)
-            entry.file = path unless path =~ /[\*\[\?\{]/
+            pattern
           end
         end
       end
+
+      klass.before :save do |entry|
+        unless entry.file
+          path = klass.path(entry.filepath_data)
+          entry.file = path unless path =~ /[\*\[\?\{]/
+        end
+      end
     end
+
   end
 end

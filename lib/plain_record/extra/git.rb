@@ -35,10 +35,8 @@ module PlainRecord::Extra
   #     virtual :updated_at, git_modify_time
   #   end
   module Git
-    class << self
-      def included(base)
-        base.send :extend, Model
-      end
+    def self.included(base)
+      base.send :extend, Model
     end
 
     # Return time of first commit of model file (created time).
@@ -66,8 +64,6 @@ module PlainRecord::Extra
     end
 
     module Model
-
-      private
 
       # Filter to set default value to time of last file git commit.
       # If file is not commited or has changes, filter will return `Time.now`.

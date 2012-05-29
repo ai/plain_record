@@ -31,6 +31,7 @@ require dir + 'filepath'
 require dir + 'association_proxy'
 require dir + 'associations'
 require dir + 'type'
+require dir + 'file'
 require dir + 'model'
 require dir + 'resource'
 
@@ -47,7 +48,7 @@ module PlainRecord
     # as <tt>/content/</tt>).
     def root=(value)
       value  = value.to_s
-      value += File::SEPARATOR if File::SEPARATOR != value[-1..-1]
+      value += ::File::SEPARATOR if ::File::SEPARATOR != value[-1..-1]
       @root  = value
     end
 
@@ -55,7 +56,7 @@ module PlainRecord
     #
     # If you set +path+ it will be added to root path.
     def root(path = '')
-      File.join(@root, path)
+      ::File.join(@root, path)
     end
   end
 end

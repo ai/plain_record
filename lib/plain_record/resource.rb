@@ -48,11 +48,12 @@ module PlainRecord
   #     text    :content
   #   end
   module Resource
-    class << self
-      def included(base)
-        base.send :extend, Model
-      end
+    def self.included(base)
+      base.send :extend, Model
+      base.send :extend, PlainRecord::File::Model
     end
+
+    include PlainRecord::File
 
     # Fields values.
     attr_reader :data
