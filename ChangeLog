@@ -1,3 +1,14 @@
+== 0.3 (Chlorine)
+* Use modules to use super in filters.
+* Add filter to i18n support.
+* Add filters to get updated and created time from git.
+* Add filters to set field type.
+* Add filter to set default field value.
+* Add alternate hash syntax to define filters.
+* Set deault data root in Rails project.
+* Fix association cache.
+* Allow to set Pathname in data root.
+
 == 0.2 (Smallpox)
 * Add associations.
 * Add special syntax for virtual properties.
