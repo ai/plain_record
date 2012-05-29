@@ -177,7 +177,7 @@ module PlainRecord::Extra
       # By default use <tt>Rails.root</tt>.
       def image_url_to_path(url)
         if defined? ::Rails
-          ::Rails.root.join('public').join(url).to_s
+          ::Rails.root.join('app/assets/images').join(url).to_s
         else
           raise ArgumentError,
                'You must set `image_to` or redefine `image_url_to_path`'
