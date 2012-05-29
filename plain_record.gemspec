@@ -22,6 +22,8 @@ Gem::Specification.new do |s|
   s.email    = 'andrey@sitnik.ru'
   s.homepage = 'https://github.com/ai/plain_record'
 
+  s.add_dependency "escape", [">= 0"]
+
   s.add_development_dependency "bundler",   [">= 1.0.10"]
   s.add_development_dependency "yard",      [">= 0"]
   s.add_development_dependency "rake",      [">= 0"]
@@ -29,4 +31,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "redcarpet", [">= 0"]
   s.add_development_dependency "r18n-core", [">= 0"]
   s.add_development_dependency "i18n",      [">= 0"]
+  s.add_development_dependency "rmagick",   [">= 0"]
 end

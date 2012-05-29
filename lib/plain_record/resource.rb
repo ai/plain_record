@@ -103,8 +103,8 @@ module PlainRecord
           unless self.class.path =~ /[\*\[\?\{]/
             self.file = self.class.path
           else
-            raise ArgumentError, "There isn't file to save entry. " +
-                                 "Set filepath fields or file."
+            raise ArgumentError,
+                 "There isn't file to save entry. Set filepath fields or file."
           end
         end
 

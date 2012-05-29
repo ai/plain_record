@@ -59,8 +59,8 @@ module PlainRecord
     def in_filepath(number)
       proc do |model, field, type|
         if :virtual != type
-          raise ArgumentError, "You must create filepath field #{field}" +
-                               ' virtual creator'
+          raise ArgumentError,
+               "You must create filepath field #{field} virtual creator"
         end
 
         Filepath.install(model) unless model.filepath_fields

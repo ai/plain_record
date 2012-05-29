@@ -114,8 +114,8 @@ module PlainRecord
           map = Associations.map(model, klass, "#{field}_") if map.empty?
           Associations.define_link_one(model, klass, field, map)
         else
-          raise ArgumentError, "You couldn't create association field" +
-                               " #{field} by text creator"
+          raise ArgumentError,
+               "You couldn't create association field #{field} by text creator"
         end
       end
     end
@@ -133,8 +133,8 @@ module PlainRecord
           map = Associations.map(klass, model, prefix) if map.empty?
           Associations.define_link_many(model, klass, field, map)
         else
-          raise ArgumentError, "You couldn't create association field" +
-                               " #{field} by text creator"
+          raise ArgumentError,
+               "You couldn't create association field #{field} by text creator"
         end
       end
     end

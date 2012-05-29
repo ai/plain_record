@@ -37,8 +37,9 @@ require dir + 'resource'
 
 module PlainRecord
   module Extra
-    autoload :Git,  'plain_record/extra/git'
-    autoload :I18n, 'plain_record/extra/i18n'
+    autoload :Git,   'plain_record/extra/git'
+    autoload :I18n,  'plain_record/extra/i18n'
+    autoload :Image, 'plain_record/extra/image'
   end
 
   class << self
@@ -65,4 +66,5 @@ if defined? Rails
   ActiveSupport.on_load(:after_initialize) do
     PlainRecord.root = Rails.root.join('data')
   end
+  PlainRecord::Extra::Image.convert_on_each_request = Rails.env.development?
 end
