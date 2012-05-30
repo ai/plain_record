@@ -60,9 +60,13 @@ describe PlainRecord::Extra::Image do
     one.logo.original.should == PlainRecord.root('a/logo.png')
     one.logo.file.should be_nil
     one.logo.url.should  be_nil
-    one.logo(:small).url.should  == 'logo.small.png'
-    one.logo(:small).file.should == 'p/logo.small.png'
-    one.photo.url.should == 'photo..png'
+    one.logo(:small).url.should       == 'logo.small.png'
+    one.logo(:small).file.should      == 'p/logo.small.png'
+    one.logo(:small).size.should      == '16x16'
+    one.logo(:small).width.should     ==  16
+    one.logo(:small).height.should    ==  16
+    one.logo(:small).size_name.should == :small
+    one.photo.url.should              == 'photo..png'
   end
 
   it "should copy image without size" do

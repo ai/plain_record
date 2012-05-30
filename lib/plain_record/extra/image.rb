@@ -103,7 +103,16 @@ module PlainRecord::Extra
     class Data
 
       # Name of image size.
+      attr_reader :size_name
+
+      # Format of image size.
       attr_reader :size
+
+      # Image width.
+      attr_reader :width
+
+      # Image height.
+      attr_reader :height
 
       # Converted image URL.
       attr_reader :url
@@ -118,8 +127,14 @@ module PlainRecord::Extra
       def initialize(entry, field, size)
         entry.convert_images! if Image.convert_on_each_request
 
-        @size = size
-        @original = entry.class.get_image_from(entry, field)
+        @size_name = size
+        @original  = entry.class.get_image_from(entry, field)
+
+        if size
+          @size = entry.class.image_sizes[field][size]
+          @width, @height = @size.split('x').map { |i| i.to_i }
+        end
+
         if size or entry.class.image_sizes[field].empty?
           @url  = entry.class.get_image_url(entry, field, size)
           @file = entry.class.get_image_to(entry, field, size)
