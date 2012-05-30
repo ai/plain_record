@@ -1,5 +1,5 @@
 =begin
-Extention to set to get field value from file.
+Extention to set to get field value from external file.
 
 Copyright (C) 2012 Andrey “A.I.” Sitnik <andrey@sitnik.ru>,
 sponsored by Evil Martians.
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
 module PlainRecord
-  # Extention to set to get field value from file.
+  # Extention to set to get field value from external file.
   #
   #   class Post
   #     include PlainRecord::Resource
@@ -75,6 +75,7 @@ module PlainRecord
             def #{field}
               path = field_filepath(:#{field})
               return @unsaved_files[path] if @unsaved_files.has_key? path
+              return nil unless ::File.exists? path
               ::File.read(path)
             end
 

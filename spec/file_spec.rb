@@ -18,7 +18,8 @@ describe PlainRecord::File do
   end
 
   it "should read field from file" do
-    File.stub(:read)
+    File.stub!(:exists?).and_return(true)
+    File.stub!(:read)
 
     type = '1'
     klass = Class.new do
@@ -33,6 +34,16 @@ describe PlainRecord::File do
     type = '2'
     File.should_receive(:read).with(PlainRecord.root('2')).and_return('B')
     one.a.should == 'B'
+  end
+
+  it "should return if file is not exists" do
+    klass = Class.new do
+      include PlainRecord::Resource
+      virtual :a, file { 'a' }
+    end
+
+    one = klass.new
+    one.a.should be_nil
   end
 
   it "should cache new value" do
@@ -56,7 +67,7 @@ describe PlainRecord::File do
 
   it "should save new value to file" do
     file = ''
-    File.stub(:open)
+    File.stub!(:open)
     File.should_receive(:open).with(PlainRecord.root('a'), 'w').and_yield(file)
     File.should_receive(:open).with(PlainRecord.root('file'), 'w').and_yield("")
 
