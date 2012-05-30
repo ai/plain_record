@@ -116,8 +116,11 @@ describe PlainRecord::Extra::Image do
       [entry]
     end
 
-    Dir.stub!(:glob).and_yield('a.png')
+    Dir.stub!(:glob).and_yield('images/data/a.png')
     Dir.should_receive(:glob).with('images/data/**/*')
+
+    File.stub!(:exists?).and_return(true)
+    File.should_receive(:exists?).with('images/data/a.png')
 
     FileUtils.stub!(:rm_r)
     FileUtils.should_receive(:rm_r).with('images/data/a.png')

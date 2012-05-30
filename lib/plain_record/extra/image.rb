@@ -54,6 +54,8 @@ module PlainRecord::Extra
   #
   #   # There are images at `data/users/avatar/ai.png` and
   #   # `data/users/photo/ai.png`
+  #
+  #   PlainRecord::Extra::Image.convert_images!
   #   user = User.first(name: 'ai')
   #
   #   user.photo.url  #=> "data/users/ai/photo.png"
@@ -66,8 +68,8 @@ module PlainRecord::Extra
 
       def included(base)
         base.send :extend, Model
-        @included_in ||= []
-        @included_in << base
+        self.included_in ||= []
+        self.included_in << base
       end
 
       # Define class variables.
@@ -77,7 +79,8 @@ module PlainRecord::Extra
 
       # Convert images in all models.
       def convert_images!
-        @included_in.each { |model| model.convert_images! }
+        return unless included_in
+        included_in.each { |model| model.convert_images! }
       end
     end
 
@@ -89,6 +92,7 @@ module PlainRecord::Extra
 
         if sizes.empty?
           to = self.class.get_image_file(self, field, nil)
+          FileUtils.mkpath(File.dirname(to))
           FileUtils.cp(from, to)
         else
           require 'RMagick'
@@ -98,6 +102,7 @@ module PlainRecord::Extra
             w, h  = size.split('x')
             image = source.resize(w.to_i, h.to_i)
             self.class.use_callbacks(:convert_image, self, to) do
+              FileUtils.mkpath(File.dirname(to))
               image.write(to)
             end
           end
@@ -175,8 +180,7 @@ module PlainRecord::Extra
         end
 
         Dir.glob(File.join(converted_images_dir, '**/*')) do |file|
-          path = File.join(converted_images_dir, file)
-          FileUtils.rm_r(path)
+          FileUtils.rm_r(file) if File.exists? file
         end
 
         all.each { |i| i.convert_images! }

@@ -33,6 +33,7 @@ end
 module PlainRecord::RailsController
   private
   def plain_record_convert_images
+    Dir.glob(Rails.root.join('app/models/**/*.rb')) { |i| require_dependency i }
     PlainRecord::Extra::Image.convert_images!
   end
 end
