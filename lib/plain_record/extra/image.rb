@@ -91,6 +91,7 @@ module PlainRecord::Extra
           to = self.class.get_image_file(self, field, nil)
           FileUtils.cp(from, to)
         else
+          require 'RMagick'
           source = ::Magick::Image.read(from).first
           sizes.each_pair do |name, size|
             to    = self.class.get_image_file(self, field, name)
@@ -265,8 +266,6 @@ module PlainRecord::Extra
         proc do |model, name, type|
           Image.install(model) unless model.image_sizes
           model.image_sizes[name] = sizes
-
-          require 'RMagick' unless sizes.empty?
 
           model.add_accessors <<-EOS, __FILE__, __LINE__
             def #{name}(size = nil)
