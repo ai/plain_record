@@ -20,14 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ActiveSupport.on_load(:after_initialize) do
   PlainRecord.root = Rails.root.join('data')
-end
-
-module PlainRecord::Extra::Image
-  def self.install(klass)
-    klass.image_sizes = { }
-    klass.converted_images_url = 'data/'
-    klass.converted_images_dir = Rails.root.join('app/assets/images/data/')
-  end
+  PlainRecord::Extra::Image.dir = Rails.root.join('app/assets/images/data/')
+  PlainRecord::Extra::Image.url = 'data/'
 end
 
 module PlainRecord::RailsController

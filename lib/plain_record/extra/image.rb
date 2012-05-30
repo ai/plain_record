@@ -66,6 +66,13 @@ module PlainRecord::Extra
       # Models, that used this extention.
       attr_accessor :included_in
 
+      # Base of converted images.
+      # Set to <tt>app/aseets/images/data</tt> in Rails.
+      attr_accessor :dir
+
+      # Base of converted images URL. Set to <tt>data/</tt> in Rails.
+      attr_accessor :url
+
       def included(base)
         base.send :extend, Model
         self.included_in ||= []
@@ -77,11 +84,39 @@ module PlainRecord::Extra
         klass.image_sizes = { }
       end
 
+      def dir
+        unless @dir
+          raise ArgumentError,
+               'You need to set `PlainRecord::Extra::Image.dir`'
+        end
+        @dir
+      end
+
+      def url
+        unless @url
+          raise ArgumentError,
+               'You need to set `PlainRecord::Extra::Image.url`'
+        end
+        @url
+      end
+
+      # Delete all converted images.
+      def clean_images!
+        Dir.glob(File.join(Image.dir, '**/*')) do |file|
+          FileUtils.rm_r(file) if File.exists? file
+        end
+      end
+
       # Convert images in all models.
       def convert_images!
+        clean_images!
         return unless included_in
-        included_in.each { |model| model.convert_images! }
+
+        included_in.each do |model|
+          model.all.each { |i| i.convert_images! }
+        end
       end
+
     end
 
     # Convert all images to public dir.
@@ -161,37 +196,6 @@ module PlainRecord::Extra
       # Hash of image sizes.
       attr_accessor :image_sizes
 
-      # Base of converted images.
-      #
-      # Set to <tt>app/aseets/images/data</tt> in Rails.
-      attr_accessor :converted_images_dir
-
-
-      # Base of converted images URL.
-      #
-      # Set to <tt>app/aseets/images/data</tt> in Rails.
-      attr_accessor :converted_images_url
-
-      # Remove all old images and convert new.
-      def clean_images!
-        unless converted_images_dir
-          raise ArgumentError, 'You need to set `converted_images_dir` ' +
-                               "in #{to_s} to clean images."
-        end
-
-        Dir.glob(File.join(converted_images_dir, '**/*')) do |file|
-          FileUtils.rm_r(file) if File.exists? file
-        end
-
-        all.each { |i| i.convert_images! }
-      end
-
-      # Convert images for all models.
-      def convert_images!
-        clean_images!
-        all.each { |i| i.convert_images! }
-      end
-
       # Set source image path.
       def image_from(&block)
         @image_from = block
@@ -209,28 +213,20 @@ module PlainRecord::Extra
 
       # Get converted image path.
       def get_image_file(entry, field, size)
-        unless converted_images_dir
-          raise ArgumentError, 'You need to set `converted_images_dir` ' +
-                               'in #{to_s} to calculate file path.'
-        end
         unless @image_url
-          raise ArgumentError, 'You need to set `image_url` ' +
-                               "in #{to_s} to calculate file path."
+          raise ArgumentError,
+               "You need to set `image_url` in #{to_s} to calculate file path."
         end
-        File.join(converted_images_dir, @image_url.call(entry, field, size))
+        File.join(Image.dir, @image_url.call(entry, field, size))
       end
 
       # Get relative image URL path.
       def get_image_url(entry, field, size)
-        unless converted_images_url
-          raise ArgumentError, 'You need to set `converted_images_url` ' +
-                               "in #{to_s} to calculate URL."
-        end
         unless @image_url
-          raise ArgumentError, 'You need to set `image_url` ' +
-                               "in #{to_s} to calculate file path."
+          raise ArgumentError,
+               "You need to set `image_url` in #{to_s} to calculate file path."
         end
-        File.join(converted_images_url, @image_url.call(entry, field, size))
+        File.join(Image.url, @image_url.call(entry, field, size))
       end
 
       private

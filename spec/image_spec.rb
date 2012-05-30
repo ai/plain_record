@@ -3,12 +3,12 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 describe PlainRecord::Extra::Image do
 
   before do
+    PlainRecord::Extra::Image.dir = 'images/data/'
+    PlainRecord::Extra::Image.url = 'data/'
+
     @klass = Class.new do
       include PlainRecord::Resource
       include PlainRecord::Extra::Image
-
-      self.converted_images_dir = 'images/data/'
-      self.converted_images_url = 'data/'
 
       image_from { |entry, field|       "#{entry.name}/#{field}.png" }
       image_url  { |entry, field, size| "#{field}.#{size}.png" }
@@ -23,28 +23,20 @@ describe PlainRecord::Extra::Image do
   end
 
   it "should throw error if there is no image_to" do
-    klass = Class.new do
-      include PlainRecord::Resource
-      include PlainRecord::Extra::Image
-
-      image_from { "a" }
-      image_url  { "b" }
-
-      field   :name
-      virtual :logo,  image(:small => '16x16')
-    end
+    PlainRecord::Extra::Image.dir = nil
+    PlainRecord::Extra::Image.url = nil
 
     lambda {
-      klass.get_image_file(klass.new, :logo, :small)
-    }.should raise_error(ArgumentError, /converted_images_dir/)
+      @klass.get_image_file(@entry, :logo, :small)
+    }.should raise_error(ArgumentError, /Image.dir/)
 
     lambda {
-      klass.convert_images!
-    }.should raise_error(ArgumentError, /converted_images_dir/)
+      PlainRecord::Extra::Image.convert_images!
+    }.should raise_error(ArgumentError, /Image.dir/)
 
     lambda {
-      klass.get_image_url(klass.new, :logo, :small)
-    }.should raise_error(ArgumentError, /converted_images_url/)
+      @klass.get_image_url(@entry, :logo, :small)
+    }.should raise_error(ArgumentError, /Image.url/)
   end
 
   it "should calculate paths" do
@@ -108,7 +100,24 @@ describe PlainRecord::Extra::Image do
     @entry.convert_images!
   end
 
+  it "should remember all models, which use extention" do
+    PlainRecord::Extra::Image.included_in = []
+
+    one = Class.new do
+      include PlainRecord::Resource
+      include PlainRecord::Extra::Image
+    end
+    two = Class.new do
+      include PlainRecord::Resource
+      include PlainRecord::Extra::Image
+    end
+
+    PlainRecord::Extra::Image.included_in.should == [one, two]
+  end
+
   it "should delete all old image" do
+    PlainRecord::Extra::Image.included_in = [@klass]
+
     def @klass.entry
       @entry ||= self.new
     end
@@ -127,27 +136,6 @@ describe PlainRecord::Extra::Image do
 
     @klass.entry.stub(:convert_images!)
     @klass.entry.should_receive(:convert_images!)
-
-    @klass.convert_images!
-  end
-
-  it "should convert images in all models" do
-    PlainRecord::Extra::Image.included_in = []
-
-    one = Class.new do
-      include PlainRecord::Resource
-      include PlainRecord::Extra::Image
-    end
-    two = Class.new do
-      include PlainRecord::Resource
-      include PlainRecord::Extra::Image
-    end
-
-    one.stub(:convert_images!)
-    two.stub(:convert_images!)
-
-    one.should_receive(:convert_images!).once
-    two.should_receive(:convert_images!).once
 
     PlainRecord::Extra::Image.convert_images!
   end
