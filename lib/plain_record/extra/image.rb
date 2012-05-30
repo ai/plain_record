@@ -86,7 +86,7 @@ module PlainRecord::Extra
           to = self.class.get_image_to(self, field, nil)
           FileUtils.cp(from, to)
         else
-          source = ::Magick::Image.read(from)
+          source = ::Magick::Image.read(from).first
           sizes.each_pair do |name, size|
             to    = self.class.get_image_to(self, field, name)
             w, h  = size.split('x')
@@ -209,11 +209,12 @@ module PlainRecord::Extra
       #     …
       #   end
       def optimize_png
-        after :convert_image do |entry, file|
-          file = file.gsub(/([^A-Za-z0-9_\-,:\/@])/, "\\\\\\1")
+        after :convert_image do |result, entry, file|
+          file = file.gsub(/([^A-Za-z0-9_\-\.,:\/@])/, "\\\\\\1")
+          file = file.gsub(/(^|\/)\.?\.($|\/)/, '')
           return unless file =~ /\.png$/
 
-          tmp = Pathname(file + '.optimized')
+          tmp = file + '.optimized'
           `pngcrush -rem gAMA -rem cHRM -rem iCCP -rem sRGB "#{file}" "#{tmp}"`
           FileUtils.rm(file)
           FileUtils.mv(tmp, file)

@@ -108,7 +108,7 @@ describe PlainRecord::Extra::Image do
 
     Magick::Image.stub!(:read)
     Magick::Image.should_receive(:read).
-      with(PlainRecord.root('a/logo.png')).and_return(original)
+      with(PlainRecord.root('a/logo.png')).and_return([original])
 
     one.convert_images!
   end
