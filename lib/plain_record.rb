@@ -62,9 +62,4 @@ module PlainRecord
   end
 end
 
-if defined? Rails
-  ActiveSupport.on_load(:after_initialize) do
-    PlainRecord.root = Rails.root.join('data')
-  end
-  PlainRecord::Extra::Image.convert_on_each_request = Rails.env.development?
-end
+require(dir + 'rails') if defined? Rails

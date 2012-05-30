@@ -7,6 +7,9 @@ describe PlainRecord::Extra::Image do
       include PlainRecord::Resource
       include PlainRecord::Extra::Image
 
+      self.converted_images_dir = 'images/data/'
+      self.converted_images_url = 'data/'
+
       image_from { |entry, field|       "#{entry.name}/#{field}.png" }
       image_url  { |entry, field, size| "#{field}.#{size}.png" }
 
@@ -14,93 +17,84 @@ describe PlainRecord::Extra::Image do
       virtual :logo,  image(:small => '16x16')
       virtual :photo, image
     end
-  end
 
-  after do
-    PlainRecord::Extra::Image.convert_on_each_request = false
-  end
-
-  it "should calculate paths" do
-    @klass.class_exec do
-      image_to   { |entry, field, size| "#{entry.name}/#{field}.#{size}.png" }
-    end
-    one = @klass.new
-    one.name = 'a'
-
-    @klass.get_image_from(one, :logo).should == PlainRecord.root('a/logo.png')
-    @klass.get_image_to(one,   :logo, :small).should  == 'a/logo.small.png'
-    @klass.get_image_url(one,  :logo, :small).should  == 'logo.small.png'
+    @entry = @klass.new
+    @entry.name = 'a'
   end
 
   it "should throw error if there is no image_to" do
-    lambda {
-      @klass.get_image_to(@klass.new, :logo, :small)
-    }.should raise_error(ArgumentError, /image_to/)
-  end
+    klass = Class.new do
+      include PlainRecord::Resource
+      include PlainRecord::Extra::Image
 
-  it "should convert url to file by image_url_to_path" do
-    def @klass.image_url_to_path(url)
-      'p/' + url
+      image_from { "a" }
+      image_url  { "b" }
+
+      field   :name
+      virtual :logo,  image(:small => '16x16')
     end
 
-    @klass.get_image_to(@klass.new, :logo, :small).should == 'p/logo.small.png'
+    lambda {
+      klass.get_image_file(klass.new, :logo, :small)
+    }.should raise_error(ArgumentError, /converted_images_dir/)
+
+    lambda {
+      klass.convert_images!
+    }.should raise_error(ArgumentError, /converted_images_dir/)
+
+    lambda {
+      klass.get_image_url(klass.new, :logo, :small)
+    }.should raise_error(ArgumentError, /converted_images_url/)
+  end
+
+  it "should calculate paths" do
+    @klass.get_image_from(@entry, :logo).should ==
+      PlainRecord.root('a/logo.png')
+    @klass.get_image_file(@entry, :logo, :small).should ==
+      'images/data/logo.small.png'
+    @klass.get_image_url(@entry,  :logo, :small).should ==
+      'data/logo.small.png'
   end
 
   it "should return image data" do
-    def @klass.image_url_to_path(url)
-      'p/' + url
-    end
-    one = @klass.new
-    one.name = 'a'
-
-    one.logo.should_not be_exists
+    @entry.logo.should_not be_exists
     File.stub!(:exists?).and_return(true)
-    one.logo.should be_exists
+    @entry.logo.should be_exists
 
-    one.logo.original.should == PlainRecord.root('a/logo.png')
-    one.logo.file.should be_nil
-    one.logo.url.should  be_nil
-    one.logo(:small).url.should       == 'logo.small.png'
-    one.logo(:small).file.should      == 'p/logo.small.png'
-    one.logo(:small).size.should      == '16x16'
-    one.logo(:small).width.should     ==  16
-    one.logo(:small).height.should    ==  16
-    one.logo(:small).size_name.should == :small
-    one.photo.url.should              == 'photo..png'
+    @entry.logo.original.should == PlainRecord.root('a/logo.png')
+    @entry.logo.file.should be_nil
+    @entry.logo.url.should  be_nil
+    @entry.logo(:small).url.should       == 'data/logo.small.png'
+    @entry.logo(:small).file.should      == 'images/data/logo.small.png'
+    @entry.logo(:small).size.should      == '16x16'
+    @entry.logo(:small).width.should     ==  16
+    @entry.logo(:small).height.should    ==  16
+    @entry.logo(:small).size_name.should == :small
+    @entry.photo.url.should              == 'data/photo..png'
   end
 
   it "should copy image without size" do
-    def @klass.image_url_to_path(url)
-      'p/' + url
-    end
-    one = @klass.new
-    one.name = 'a'
-
     File.stub!(:exists?)
+    File.should_receive(:exists?).
+      with(PlainRecord.root('a/logo.png')).and_return(false)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/photo.png')).and_return(true)
 
     FileUtils.stub!(:cp)
     FileUtils.should_receive(:cp).
-      with(PlainRecord.root('a/photo.png'), 'p/photo..png')
+      with(PlainRecord.root('a/photo.png'), 'images/data/photo..png')
 
-    one.convert_images!
+    @entry.convert_images!
   end
 
-  it "should resize image" do
-    def @klass.image_url_to_path(url)
-      'p/' + url
-    end
-    one = @klass.new
-    one.name = 'a'
-
+  it "should resize image", :unless => defined?(JRUBY_VERSION) do
     File.stub!(:exists?)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/logo.png')).and_return(true)
 
     thumb = double('thumb')
     thumb.stub!(:write)
-    thumb.should_receive(:write).with('p/logo.small.png')
+    thumb.should_receive(:write).with('images/data/logo.small.png')
 
     original = double('original')
     original.stub!(:resize)
@@ -110,20 +104,48 @@ describe PlainRecord::Extra::Image do
     Magick::Image.should_receive(:read).
       with(PlainRecord.root('a/logo.png')).and_return([original])
 
-    one.convert_images!
+    @entry.convert_images!
   end
 
-  it "should convert images on every call in development" do
-    def @klass.image_url_to_path(url)
-      'p/' + url
+  it "should delete all old image" do
+    def @klass.entry
+      @entry ||= self.new
     end
-    one = @klass.new
+    def @klass.all
+      [entry]
+    end
 
-    PlainRecord::Extra::Image.convert_on_each_request = true
+    Dir.stub!(:glob).and_yield('a.png')
+    Dir.should_receive(:glob).with('images/data/**/*')
+
+    FileUtils.stub!(:rm_r)
+    FileUtils.should_receive(:rm_r).with('images/data/a.png')
+
+    @klass.entry.stub(:convert_images!)
+    @klass.entry.should_receive(:convert_images!)
+
+    @klass.convert_images!
+  end
+
+  it "should convert images in all models" do
+    PlainRecord::Extra::Image.included_in = []
+
+    one = Class.new do
+      include PlainRecord::Resource
+      include PlainRecord::Extra::Image
+    end
+    two = Class.new do
+      include PlainRecord::Resource
+      include PlainRecord::Extra::Image
+    end
+
     one.stub(:convert_images!)
+    two.stub(:convert_images!)
 
-    one.should_receive(:convert_images!)
-    one.photo
+    one.should_receive(:convert_images!).once
+    two.should_receive(:convert_images!).once
+
+    PlainRecord::Extra::Image.convert_images!
   end
 
 end

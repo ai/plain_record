@@ -56,23 +56,28 @@ module PlainRecord::Extra
   #   # `data/users/photo/ai.png`
   #   user = User.first(name: 'ai')
   #
-  #   user.avatar(:small).url #=> "users/ai/avatar.small.png"
-  #   user.photo.url          #=> "users/ai/photo.png"
+  #   user.photo.url  #=> "data/users/ai/photo.png"
+  #   user.photo.file #=> "app/assets/images/data/users/ai/avatar.small.png"
+  #   user.avatar(:small).url  #=> "data/users/ai/avatar.small.png"
   module Image
     class << self
-      # Should be +true+ in development mode to convert enrty images on
-      # every field getter call.
-      #
-      # In Ruby on Rails it will be set to +true+ automatically in development.
-      attr_accessor :convert_on_each_request
+      # Models, that used this extention.
+      attr_accessor :included_in
 
       def included(base)
         base.send :extend, Model
+        @included_in ||= []
+        @included_in << base
       end
 
       # Define class variables.
       def install(klass)
         klass.image_sizes = { }
+      end
+
+      # Convert images in all models.
+      def convert_images!
+        @included_in.each { |model| model.convert_images! }
       end
     end
 
@@ -83,12 +88,12 @@ module PlainRecord::Extra
         next unless File.exists? from
 
         if sizes.empty?
-          to = self.class.get_image_to(self, field, nil)
+          to = self.class.get_image_file(self, field, nil)
           FileUtils.cp(from, to)
         else
           source = ::Magick::Image.read(from).first
           sizes.each_pair do |name, size|
-            to    = self.class.get_image_to(self, field, name)
+            to    = self.class.get_image_file(self, field, name)
             w, h  = size.split('x')
             image = source.resize(w.to_i, h.to_i)
             self.class.use_callbacks(:convert_image, self, to) do
@@ -125,8 +130,6 @@ module PlainRecord::Extra
 
       # Set image paths.
       def initialize(entry, field, size)
-        entry.convert_images! if Image.convert_on_each_request
-
         @size_name = size
         @original  = entry.class.get_image_from(entry, field)
 
@@ -137,7 +140,7 @@ module PlainRecord::Extra
 
         if size or entry.class.image_sizes[field].empty?
           @url  = entry.class.get_image_url(entry, field, size)
-          @file = entry.class.get_image_to(entry, field, size)
+          @file = entry.class.get_image_file(entry, field, size)
         end
       end
 
@@ -152,17 +155,44 @@ module PlainRecord::Extra
       # Hash of image sizes.
       attr_accessor :image_sizes
 
+      # Base of converted images.
+      #
+      # Set to <tt>app/aseets/images/data</tt> in Rails.
+      attr_accessor :converted_images_dir
+
+
+      # Base of converted images URL.
+      #
+      # Set to <tt>app/aseets/images/data</tt> in Rails.
+      attr_accessor :converted_images_url
+
+      # Remove all old images and convert new.
+      def clean_images!
+        unless converted_images_dir
+          raise ArgumentError, 'You need to set `converted_images_dir` ' +
+                               "in #{to_s} to clean images."
+        end
+
+        Dir.glob(File.join(converted_images_dir, '**/*')) do |file|
+          path = File.join(converted_images_dir, file)
+          FileUtils.rm_r(path)
+        end
+
+        all.each { |i| i.convert_images! }
+      end
+
+      # Convert images for all models.
+      def convert_images!
+        clean_images!
+        all.each { |i| i.convert_images! }
+      end
+
       # Set source image path.
       def image_from(&block)
         @image_from = block
       end
 
-      # Set converted image path.
-      def image_to(&block)
-        @image_to = block
-      end
-
-      # Set relative image URL path.
+      # Set relative image URL path from +image_base+.
       def image_url(&block)
         @image_url = block
       end
@@ -173,31 +203,32 @@ module PlainRecord::Extra
       end
 
       # Get converted image path.
-      def get_image_to(entry, field, size)
-        if @image_to
-          @image_to.call(entry, field, size)
-        else
-          image_url_to_path(get_image_url(entry, field, size))
+      def get_image_file(entry, field, size)
+        unless converted_images_dir
+          raise ArgumentError, 'You need to set `converted_images_dir` ' +
+                               'in #{to_s} to calculate file path.'
         end
+        unless @image_url
+          raise ArgumentError, 'You need to set `image_url` ' +
+                               "in #{to_s} to calculate file path."
+        end
+        File.join(converted_images_dir, @image_url.call(entry, field, size))
       end
 
       # Get relative image URL path.
       def get_image_url(entry, field, size)
-        @image_url.call(entry, field, size) if @image_url
+        unless converted_images_url
+          raise ArgumentError, 'You need to set `converted_images_url` ' +
+                               "in #{to_s} to calculate URL."
+        end
+        unless @image_url
+          raise ArgumentError, 'You need to set `image_url` ' +
+                               "in #{to_s} to calculate file path."
+        end
+        File.join(converted_images_url, @image_url.call(entry, field, size))
       end
 
-      # Convert image url to local file path. It will be used, if +image_to+
-      # will not be set.
-      #
-      # By default use <tt>Rails.root</tt>.
-      def image_url_to_path(url)
-        if defined? ::Rails
-          ::Rails.root.join('app/assets/images').join(url).to_s
-        else
-          raise ArgumentError,
-               'You must set `image_to` or redefine `image_url_to_path`'
-        end
-      end
+      private
 
       # Use pngcrush (you must install it in system) to optimize png images.
       #
