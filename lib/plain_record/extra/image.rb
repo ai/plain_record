@@ -102,7 +102,7 @@ module PlainRecord::Extra
 
       # Delete all converted images.
       def clean_images!
-        Dir.glob(File.join(Image.dir, '**/*')) do |file|
+        Dir.glob(File.join(self.dir, '**/*')) do |file|
           FileUtils.rm_r(file) if File.exists? file
         end
       end

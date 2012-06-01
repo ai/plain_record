@@ -144,16 +144,22 @@ module PlainRecord
       def define_real_one(klass, field, model)
         name = field.to_s
         klass.after :load do |result, entry|
-          entry.data[name] = model.new(entry.file, entry.data[name])
+          if entry.data[name]
+            entry.data[name] = model.new(entry.file, entry.data[name])
+          end
           result
         end
         klass.before :save do |entry|
-          model.call_before_callbacks(:save, [entry.data[name]])
-          entry.data[name] = entry.data[name]
+          if entry.data[name]
+            model.call_before_callbacks(:save, [entry.data[name]])
+            entry.data[name] = entry.data[name]
+          end
         end
         klass.after :save do |result, entry|
-          entry.data[name] = model.new(entry.file, entry.data[name])
-          model.call_after_callbacks(:save, nil, [entry.data[name]])
+          if entry.data[name]
+            entry.data[name] = model.new(entry.file, entry.data[name])
+            model.call_after_callbacks(:save, nil, [entry.data[name]])
+          end
           result
         end
       end

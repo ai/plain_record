@@ -9,8 +9,9 @@ describe PlainRecord::Associations do
 
     class ::RatedPost
       include PlainRecord::Resource
-      entry_in 'data/3/post.md'
-      field :rate, one(::Rate)
+      entry_in 'data/*/post.md'
+      virtual :name, in_filepath(1)
+      field   :rate, one(::Rate)
     end
 
     class ::Comment
@@ -51,17 +52,21 @@ describe PlainRecord::Associations do
   end
 
   it "should load one-to-one real association" do
-    rate = ::RatedPost.first().rate
+    rate = ::RatedPost.first(:name => '3').rate
     rate.should be_instance_of(::Rate)
     rate.path.should == 'data/3/post.md'
     rate.data.should == { 'subject' => 5, 'text' => 2 }
+  end
+
+  it "should return nil if one-to-one real association is empty" do
+    ::RatedPost.first(:name => '1').rate.should be_nil
   end
 
   it "should save one-to-one real association" do
     file = StringIO.new
     File.should_receive(:open).with(anything(), 'w').and_yield(file)
 
-    ::RatedPost.first().save()
+    ::RatedPost.first(:name => '3').save()
 
     file.should has_yaml({ 'title' => 'Third',
                            'rate'  => { 'text' => 2, 'subject' => 5 } })
