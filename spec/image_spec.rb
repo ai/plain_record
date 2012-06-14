@@ -92,7 +92,7 @@ describe PlainRecord::Extra::Image do
     original.stub!(:resize)
     original.should_receive(:resize).with(16, 16).and_return(thumb)
 
-    require 'RMagick' rescue
+    require 'RMagick' unless defined? Magick
     Magick::Image.stub!(:read)
     Magick::Image.should_receive(:read).
       with(PlainRecord.root('a/logo.png')).and_return([original])
