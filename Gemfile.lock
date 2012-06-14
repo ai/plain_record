@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ai/r18n.git
-  revision: ca6933926eb955344eeb982de35f492c76a38b1a
+  revision: 8406fca2f74e003a29907ddd07b091a92f61bf7f
   specs:
     r18n-core (0.4.14)
 
@@ -21,7 +21,7 @@ GEM
     rspec-expectations (2.10.0)
       diff-lcs (~> 1.1.3)
     rspec-mocks (2.10.1)
-    yard (0.8.1)
+    yard (0.8.2.1)
 
 PLATFORMS
   ruby
