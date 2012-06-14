@@ -33,5 +33,6 @@ DEPENDENCIES
   rake
   redcarpet
   rmagick
+  rmagick4j
   rspec
   yard

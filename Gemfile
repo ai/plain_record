@@ -8,4 +8,4 @@ gem 'r18n-core', :require => nil, :github => 'ai/r18n'
 gem 'i18n',      :require => nil
 gem 'escape'
 gem 'rmagick',   :platforms => :ruby
-gem 'rmagick',   :platforms => :jruby
+gem 'rmagick4j', :platforms => :jruby
