@@ -79,7 +79,7 @@ describe PlainRecord::Extra::Image do
     @entry.convert_images!
   end
 
-  it "should resize image", :unless => defined?(JRUBY_VERSION) do
+  it "should resize image" do
     File.stub!(:exists?)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/logo.png')).and_return(true)
