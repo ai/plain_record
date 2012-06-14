@@ -61,3 +61,7 @@ RSpec::Matchers.define :has_yaml do |data|
     YAML.load(file.read).should == data
   end
 end
+
+def is_rbx
+  defined?(RUBY_ENGINE) and RUBY_ENGINE == 'rbx'
+end
