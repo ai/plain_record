@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake",      [">= 0"]
   s.add_development_dependency "rspec",     [">= 0"]
   s.add_development_dependency "redcarpet", [">= 0"]
-  s.add_development_dependency "r18n-core", [">= 0"]
+  s.add_development_dependency "r18n-core", [">= 1.0.0"]
   s.add_development_dependency "i18n",      [">= 0"]
   s.add_development_dependency "rmagick",   [">= 0"]
 end
