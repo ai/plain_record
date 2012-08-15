@@ -175,6 +175,9 @@ module PlainRecord::Extra
 
         if size
           @size = entry.class.image_sizes[field][size]
+          unless @size
+            raise ArgumentError, "Field `#{field}` doesn't have `#{size}` size"
+          end
           @width, @height = @size.split('x').map { |i| i.to_i }
         end
 

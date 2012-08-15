@@ -140,4 +140,10 @@ describe PlainRecord::Extra::Image do
     PlainRecord::Extra::Image.convert_images!
   end
 
+  it "should return right error on wrong size" do
+    lambda {
+      @entry.logo(:no)
+    }.should raise_error(ArgumentError, "Field `logo` doesn't have `no` size")
+  end
+
 end
