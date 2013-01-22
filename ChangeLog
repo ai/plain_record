@@ -1,3 +1,8 @@
+== 0.4 (Phosgene)
+* Allow to store images.
+* Allow to store field in separated file.
+* Fix JRuby and Rubinius support.
+
 == 0.3 (Chlorine)
 * Use modules to use super in filters.
 * Add filter to i18n support.

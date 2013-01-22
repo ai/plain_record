@@ -1,3 +1,3 @@
 module PlainRecord
-  VERSION = '0.3' unless defined? PlainRecord::VERSION
+  VERSION = '0.4' unless defined? PlainRecord::VERSION
 end
