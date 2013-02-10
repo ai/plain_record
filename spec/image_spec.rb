@@ -72,6 +72,8 @@ describe PlainRecord::Extra::Image do
     File.should_receive(:exists?).
       with(PlainRecord.root('a/photo.png')).and_return(true)
 
+    FileUtils.stub!(:mkpath)
+    FileUtils.should_receive(:mkpath).with('images/data')
     FileUtils.stub!(:cp)
     FileUtils.should_receive(:cp).
       with(PlainRecord.root('a/photo.png'), 'images/data/photo..png')
@@ -83,6 +85,9 @@ describe PlainRecord::Extra::Image do
     File.stub!(:exists?)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/logo.png')).and_return(true)
+
+    FileUtils.stub!(:mkpath)
+    FileUtils.should_receive(:mkpath).with('images/data')
 
     thumb = double('thumb')
     thumb.stub!(:write)
