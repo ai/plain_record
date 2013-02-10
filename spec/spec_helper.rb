@@ -55,15 +55,13 @@ RSpec::Matchers.define :has_methods do |*methods|
   end
 end
 
-RSpec::Matchers.define :has_yaml do |data|
-  match do |file|
-    file.rewind
-    YAML.load(file.read).should == data
+RSpec::Matchers.define :has_yaml do |expected|
+  match do |actual|
+    YAML.load(actual.string).should == expected
   end
 
   failure_message_for_should do |actual|
-    actual.rewind
-    "expected #{expected.first.inspect} to equal #{YAML.load(actual.read)}"
+    "expected #{expected.inspect} to equal #{YAML.load(actual.string)}"
   end
 end
 
