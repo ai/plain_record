@@ -119,9 +119,17 @@ module PlainRecord
       end
     end
 
-    # Return string of YAML representation of entry +data+.
-    def to_yaml(opts = { })
-      @data.to_yaml(opts)
+    # Return model data with plain hash of all child data
+    def data_recursive
+      hash = { }
+      @data.each_pair do |key, value|
+        hash[key] = if value.respond_to? :data_recursive
+          value.data_recursive
+        else
+          value
+        end
+      end
+      hash
     end
 
     # Compare if its fields and texts are equal.

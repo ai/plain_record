@@ -21,8 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 require 'pathname'
 require 'yaml'
 
-YAML::ENGINE.yamler = 'syck' if defined? YAML::ENGINE
-
 dir = Pathname(__FILE__).dirname.expand_path + 'plain_record'
 require dir + 'version'
 require dir + 'callbacks'

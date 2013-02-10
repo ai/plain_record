@@ -68,7 +68,7 @@ module PlainRecord
       end
 
       def entries_string(entries)
-        entries.to_yaml
+        entries.map { |i| i.data_recursive }.to_yaml
       end
     end
   end

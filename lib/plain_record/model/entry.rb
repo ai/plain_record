@@ -57,7 +57,8 @@ module PlainRecord
       end
 
       def entries_string(entry)
-        entry.to_yaml + entry.texts.map{ |i| "---\n" + i }.join("\n")
+        entry.data_recursive.to_yaml +
+          entry.texts.map { |i| "---\n" + i }.join("\n")
       end
     end
   end
