@@ -28,14 +28,13 @@ describe PlainRecord::Resource do
     first = Post.first(:title => 'First')
     first.save
 
-    file.rewind
-    file.read.should == "title: First\n" +
-                        "---\n" +
-                        "first --- content\n" +
-                        "---\n" +
-                        "big\n" +
-                        "---\n" +
-                        "content\n"
+    file.string.should == "title: First\n" +
+                          "---\n" +
+                          "first --- content\n" +
+                          "---\n" +
+                          "big\n" +
+                          "---\n" +
+                          "content\n"
   end
 
   it "should save list entry" do
