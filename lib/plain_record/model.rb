@@ -86,7 +86,7 @@ module PlainRecord
     def save_file(file)
       if @loaded.has_key? file
         ::File.open(file, 'w') do |io|
-          io << entries_string(@loaded[file]).slice(5..-1)
+          io << entries_string(@loaded[file]).sub(/^---\s+/, '')
         end
       end
     end
