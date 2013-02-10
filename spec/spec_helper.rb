@@ -60,6 +60,11 @@ RSpec::Matchers.define :has_yaml do |data|
     file.rewind
     YAML.load(file.read).should == data
   end
+
+  failure_message_for_should do |actual|
+    actual.rewind
+    "expected #{expected.first.inspect} to equal #{YAML.load(actual.read)}"
+  end
 end
 
 def is_rbx
