@@ -1,3 +1,6 @@
+== 0.4.1 (Diphosgene)
+* Add Psych support to work with Ruby 2.0.
+
 == 0.4 (Phosgene)
 * Allow to store images.
 * Allow to store field in separated file.
