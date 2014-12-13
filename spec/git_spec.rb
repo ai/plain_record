@@ -22,14 +22,6 @@ describe PlainRecord::Extra::Git do
     Time.stub!(:now).and_return(@now)
   end
 
-  it "should take file create time from git" do
-    @post.created.utc.should == Time.parse('2012-05-17 22:23:47 UTC')
-  end
-
-  it "should take file updated time from git" do
-    @post.updated.utc.should == Time.parse('2012-05-18 07:41:52 UTC')
-  end
-
   it "should overrided git time" do
     post = TimedPost.new
 
@@ -44,12 +36,6 @@ describe PlainRecord::Extra::Git do
     post = TimedPost.new
     post.created.should == @now
     post.updated.should == @now
-  end
-
-  it "shoult return now if file has uncommitted changes" do
-    @post.stub!(:git_uncommitted?).and_return(true)
-    @post.created.utc.should == Time.parse('2012-05-17 22:23:47 UTC')
-    @post.updated.should == @now
   end
 
 end
