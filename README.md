@@ -1,4 +1,4 @@
-# Plain Record
+# Plain Record [![Build Status](https://travis-ci.org/ai/plain_record.svg)](https://travis-ci.org/ai/plain_record)
 
 Plaint Record is a data persistence, which use human editable and readable plain
 text files. It’s ideal for static generated sites, like blog or homepage.
@@ -6,9 +6,9 @@ text files. It’s ideal for static generated sites, like blog or homepage.
 If you want to write another static website generator, you don’t need to write
 another file parser – you can use Plain Record.
 
-Sponsored by [Evil Martians].
-
-[Evil Martians]: http://evilmartians.com/
+<a href="https://evilmartians.com/?utm_source=plain_record">
+<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54">
+</a>
 
 ## How To
 
