@@ -6,3 +6,4 @@ doc/
 pkg/
 
 .bundle
+Gemfile.lock
