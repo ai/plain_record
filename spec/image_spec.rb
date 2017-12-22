@@ -50,7 +50,7 @@ describe PlainRecord::Extra::Image do
 
   it "should return image data" do
     @entry.logo.should_not be_exists
-    File.stub!(:exists?).and_return(true)
+    allow(File).to receive(:exists?).and_return(true)
     @entry.logo.should be_exists
 
     @entry.logo.original.should == PlainRecord.root('a/logo.png')
@@ -66,15 +66,15 @@ describe PlainRecord::Extra::Image do
   end
 
   it "should copy image without size" do
-    File.stub!(:exists?)
+    allow(File).to receive(:exists?)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/logo.png')).and_return(false)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/photo.png')).and_return(true)
 
-    FileUtils.stub!(:mkpath)
+    allow(FileUtils).to receive(:mkpath)
     FileUtils.should_receive(:mkpath).with('images/data')
-    FileUtils.stub!(:cp)
+    allow(FileUtils).to receive(:cp)
     FileUtils.should_receive(:cp).
       with(PlainRecord.root('a/photo.png'), 'images/data/photo..png')
 
@@ -82,23 +82,23 @@ describe PlainRecord::Extra::Image do
   end
 
   it "should resize image", :unless => is_rbx do
-    File.stub!(:exists?)
+    allow(File).to receive(:exists?)
     File.should_receive(:exists?).
       with(PlainRecord.root('a/logo.png')).and_return(true)
 
-    FileUtils.stub!(:mkpath)
+    allow(FileUtils).to receive(:mkpath)
     FileUtils.should_receive(:mkpath).with('images/data')
 
     thumb = double('thumb')
-    thumb.stub!(:write)
+    allow(thumb).to receive(:write)
     thumb.should_receive(:write).with('images/data/logo.small.png')
 
     original = double('original')
-    original.stub!(:resize)
+    allow(original).to receive(:resize)
     original.should_receive(:resize).with(16, 16).and_return(thumb)
 
     require 'RMagick'
-    Magick::Image.stub!(:read)
+    allow(Magick::Image).to receive(:read)
     Magick::Image.should_receive(:read).
       with(PlainRecord.root('a/logo.png')).and_return([original])
 
@@ -130,13 +130,13 @@ describe PlainRecord::Extra::Image do
       [entry]
     end
 
-    Dir.stub!(:glob).and_yield('images/data/a.png')
+    allow(Dir).to receive(:glob).and_yield('images/data/a.png')
     Dir.should_receive(:glob).with('images/data/**/*')
 
-    File.stub!(:exists?).and_return(true)
+    allow(File).to receive(:exists?).and_return(true)
     File.should_receive(:exists?).with('images/data/a.png')
 
-    FileUtils.stub!(:rm_r)
+    allow(FileUtils).to receive(:rm_r)
     FileUtils.should_receive(:rm_r).with('images/data/a.png')
 
     @klass.entry.stub(:convert_images!)

@@ -91,7 +91,7 @@ describe PlainRecord::Resource do
       text  :content
     end
 
-    callbacks  = mock()
+    callbacks = double('callbacks')
     callbacks.should_receive(:path).
       with(Callbacked.path, { :title => 'First' }).and_return('data/1/post.md')
     callbacks.should_receive(:load).with(an_instance_of Callbacked)
@@ -104,8 +104,8 @@ describe PlainRecord::Resource do
     Callbacked.before :destroy, &callbacks.method(:destroy)
 
     first = Callbacked.first({ :title => 'First' })
-    lambda { first.save }.should raise_error
-    lambda { first.destroy }.should raise_error
+    lambda { first.save }.should raise_error(RuntimeError)
+    lambda { first.destroy }.should raise_error(RuntimeError)
   end
 
 end

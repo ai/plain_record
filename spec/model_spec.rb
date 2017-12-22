@@ -57,10 +57,10 @@ describe PlainRecord::Model do
 
   it "should send field name and type type to filter" do
     klass   = Class.new
-    filter = mock
-    filter.stub!(:virtual).with(klass, :one, :virtual)
-    filter.stub!(:field).with(klass, :two,  :field)
-    filter.stub!(:text).with(klass, :three, :text)
+    filter = double('filter')
+    allow(filter).to receive(:virtual).with(klass, :one, :virtual)
+    allow(filter).to receive(:field).with(klass, :two,  :field)
+    allow(filter).to receive(:text).with(klass, :three, :text)
     klass.class_eval do
       include PlainRecord::Resource
       virtual :one,   filter.method(:virtual)
@@ -156,7 +156,7 @@ describe PlainRecord::Model do
   end
 
   it "should return entries by regexp matcher" do
-    Post.all(:title => /First/, :title => /Second/).should be_empty
+    Post.all(:title => /Second/).should be_empty
   end
 
   it "should return entries by search proc" do

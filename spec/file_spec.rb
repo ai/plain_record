@@ -18,8 +18,8 @@ describe PlainRecord::File do
   end
 
   it "should read field from file" do
-    File.stub!(:exists?).and_return(true)
-    File.stub!(:read)
+    allow(File).to receive(:exists?).and_return(true)
+    allow(File).to receive(:read)
 
     type = '1'
     klass = Class.new do
@@ -67,7 +67,7 @@ describe PlainRecord::File do
 
   it "should save new value to file" do
     file = ''
-    File.stub!(:open)
+    allow(File).to receive(:open)
     File.should_receive(:open).with(PlainRecord.root('a'), 'w').and_yield(file)
     File.should_receive(:open).with(PlainRecord.root('file'), 'w').and_yield("")
 

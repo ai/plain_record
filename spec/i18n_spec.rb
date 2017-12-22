@@ -81,6 +81,7 @@ describe PlainRecord::Extra::I18n do
   context 'i18n' do
     before :all do
       require 'i18n'
+      I18n.config.available_locales = [:en, :ru]
     end
 
     it "should git locale from I18n" do

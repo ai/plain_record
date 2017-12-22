@@ -20,7 +20,7 @@ describe PlainRecord::Callbacks do
   end
 
   it "should use before callbacks by priority" do
-    checker = mock()
+    checker = double('checked')
     checker.should_receive(:check_first).with('John', 'Smith').once.ordered
     checker.should_receive(:check_last).with('John', 'Smith').once.ordered
 

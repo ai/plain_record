@@ -1,4 +1,12 @@
+require 'rspec/collection_matchers'
+
 require File.join(File.dirname(__FILE__), '../lib/plain_record')
+
+RSpec.configure do |config|
+  config.expect_with :rspec do |expectations|
+    expectations.syntax = :should
+  end
+end
 
 class Post
   include PlainRecord::Resource
@@ -60,7 +68,7 @@ RSpec::Matchers.define :has_yaml do |expected|
     YAML.load(actual.string).should == expected
   end
 
-  failure_message_for_should do |actual|
+  failure_message do |actual|
     "expected #{expected.inspect} to equal #{YAML.load(actual.string)}"
   end
 end

@@ -19,7 +19,7 @@ describe PlainRecord::Extra::Git do
     @post = TimedPost.first(:name => '2')
 
     @now = Time.at(256)
-    Time.stub!(:now).and_return(@now)
+    allow(Time).to receive(:now).and_return(@now)
   end
 
   it "should overrided git time" do
