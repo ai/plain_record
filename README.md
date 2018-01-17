@@ -86,7 +86,7 @@ For example we will create simple blog storage with posts and comments.
     Post.all # will return array with our first post
      ```
 
-8. Get specify enrties:
+8. Get specify entries:
 
      ```ruby
     Comment.all(author: 'Anonymous')
